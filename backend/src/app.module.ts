@@ -8,10 +8,13 @@ import { TenantModule } from './modules/tenant/module';
 import { UserModule } from './modules/user/module';
 import { CustomerManagementModule } from './modules/customer-management/module';
 
+import { authConfig } from './config/auth.config';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [authConfig],
       envFilePath: ['.env'],
     }),
     DatabaseModule,
