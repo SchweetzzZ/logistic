@@ -1,20 +1,12 @@
-import {
-  Injectable,
-  Inject,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Inject, ConflictException, NotFoundException, } from '@nestjs/common';
 import { eq, and, ne, desc, like, or } from 'drizzle-orm';
 import { DRIZZLE, type DrizzleDB } from '../database/database.module';
 import { customers, Customer } from './schema/schema';
-import {
-  CreateCustomerDto,
-  UpdateCustomerDto,
-} from './dto/customer-manegement-dto';
+import { CreateCustomerDto, UpdateCustomerDto, } from './dto/customer-manegement-dto';
 
 @Injectable()
 export class CustomerManagementService {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
 
   async create(tenantId: string, dto: CreateCustomerDto): Promise<Customer> {
     const [existing] = await this.db
@@ -46,10 +38,10 @@ export class CustomerManagementService {
   async findAll(tenantId: string, search?: string): Promise<Customer[]> {
     const searchFilter = search?.trim()
       ? or(
-          like(customers.name, `%${search.trim()}%`),
-          like(customers.cpf, `%${search.trim()}%`),
-          like(customers.email, `%${search.trim()}%`),
-        )
+        like(customers.name, `%${search.trim()}%`),
+        like(customers.cpf, `%${search.trim()}%`),
+        like(customers.email, `%${search.trim()}%`),
+      )
       : undefined;
 
     const whereClause = searchFilter

@@ -18,7 +18,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 
-import { CustomerManagementService } from './service';
+import { CustomerManagementService } from './customer.service';
 import {
   CreateCustomerDto,
   UpdateCustomerDto,
@@ -38,7 +38,7 @@ import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 export class CustomerManagementController {
   constructor(
     private readonly customerService: CustomerManagementService,
-  ) {}
+  ) { }
 
   @Post()
   @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)

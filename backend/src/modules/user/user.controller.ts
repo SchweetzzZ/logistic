@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 
-import { UserService } from './service';
+import { UserService } from './user.service';
 import {
   RegisterTenantDto,
   LoginDto,
@@ -42,7 +42,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 @ApiTags('Users & Auth')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   private setAuthCookies(
     res: Response,

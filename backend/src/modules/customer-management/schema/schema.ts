@@ -1,9 +1,4 @@
-import {
-    mysqlTable,
-    varchar,
-    timestamp,
-    uniqueIndex,
-} from 'drizzle-orm/mysql-core';
+import { mysqlTable, varchar, timestamp, uniqueIndex, } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { tenants } from '../../tenant/schemas/schema';

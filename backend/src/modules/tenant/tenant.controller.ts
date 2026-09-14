@@ -5,7 +5,7 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
-import { TenantService } from './service';
+import { TenantService } from './tenant.service';
 import { TenantResponseDto, UpdateTenantDto } from './dto/tenant.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -18,7 +18,7 @@ import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tenant')
 export class TenantController {
-  constructor(private readonly tenantService: TenantService) {}
+  constructor(private readonly tenantService: TenantService) { }
 
   @Get('current')
   @ApiOperation({ summary: 'Obter dados da empresa (tenant) da sessão atual' })

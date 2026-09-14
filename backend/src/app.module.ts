@@ -4,9 +4,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './modules/database/database.module';
 import { CommonModule } from './modules/common/common.module';
-import { TenantModule } from './modules/tenant/module';
-import { UserModule } from './modules/user/module';
-import { CustomerManagementModule } from './modules/customer-management/module';
+import { TenantModule } from './modules/tenant/tenant.module';
+import { UserModule } from './modules/user/user.module';
+import { CustomerManagementModule } from './modules/customer-management/customer.module';
 
 import { authConfig } from './config/auth.config';
 
@@ -26,4 +26,4 @@ import { authConfig } from './config/auth.config';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
