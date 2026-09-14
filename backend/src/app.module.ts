@@ -6,6 +6,7 @@ import { DatabaseModule } from './modules/database/database.module';
 import { CommonModule } from './modules/common/common.module';
 import { TenantModule } from './modules/tenant/module';
 import { UserModule } from './modules/user/module';
+import { CustomerManagementModule } from './modules/customer-management/module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './modules/user/module';
     CommonModule,
     TenantModule,
     UserModule,
+    CustomerManagementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -7,7 +7,6 @@ import {
 } from '@nestjs/swagger';
 import { TenantService } from './service';
 import { TenantResponseDto, UpdateTenantDto } from './dto/tenant.dto';
-import { Tenant } from './schemas/schema';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -21,17 +20,6 @@ import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 export class TenantController {
   constructor(private readonly tenantService: TenantService) {}
 
-  private toResponseDto(tenant: Tenant): TenantResponseDto {
-    return {
-      id: tenant.id,
-      name: tenant.name,
-      document: tenant.document,
-      status: tenant.status,
-      createdAt: tenant.createdAt.toISOString(),
-      updatedAt: tenant.updatedAt.toISOString(),
-    };
-  }
-
   @Get('current')
   @ApiOperation({ summary: 'Obter dados da empresa (tenant) da sessão atual' })
   @ApiOkResponse({
@@ -41,8 +29,7 @@ export class TenantController {
   async getCurrentTenant(
     @CurrentTenant() tenantId: string,
   ): Promise<TenantResponseDto> {
-    const tenant = await this.tenantService.findById(tenantId);
-    return this.toResponseDto(tenant);
+    return this.tenantService.findById(tenantId);
   }
 
   @Patch('current')
@@ -58,7 +45,6 @@ export class TenantController {
     @CurrentTenant() tenantId: string,
     @Body() dto: UpdateTenantDto,
   ): Promise<TenantResponseDto> {
-    const tenant = await this.tenantService.update(tenantId, dto);
-    return this.toResponseDto(tenant);
+    return this.tenantService.update(tenantId, dto);
   }
 }

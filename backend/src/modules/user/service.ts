@@ -23,6 +23,12 @@ import {
   UserResponseDto,
 } from './dto/user.dto';
 
+const toSafeUser = ({
+  passwordHash,
+  refreshTokenHash,
+  ...user
+}: User): UserResponseDto => user;
+
 @Injectable()
 export class UserService {
   private readonly jwtSecret: string;
@@ -45,18 +51,6 @@ export class UserService {
       'super_secret_refresh_token_key_change_in_production_2026';
     this.refreshTokenExpiresIn =
       this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN') || '7d';
-  }
-
-  private sanitizeUser(user: User): UserResponseDto {
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      tenantId: user.tenantId,
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
-    };
   }
 
   private generateTokens(user: User) {
@@ -88,14 +82,11 @@ export class UserService {
   }
 
   async register(dto: RegisterTenantDto) {
-    const document = dto.document.trim();
-    const email = dto.email.trim().toLowerCase();
-
     // 1. Verificar se já existe empresa com este documento
     const [existingTenant] = await this.db
       .select()
       .from(tenants)
-      .where(eq(tenants.document, document))
+      .where(eq(tenants.document, dto.document))
       .limit(1);
 
     if (existingTenant) {
@@ -108,22 +99,22 @@ export class UserService {
     return this.db.transaction(async (tx) => {
       // Inserir Tenant
       await tx.insert(tenants).values({
-        name: dto.companyName.trim(),
-        document,
+        name: dto.companyName,
+        document: dto.document,
       });
 
       const [tenant] = await tx
         .select()
         .from(tenants)
-        .where(eq(tenants.document, document))
+        .where(eq(tenants.document, dto.document))
         .limit(1);
 
       const passwordHash = await bcrypt.hash(dto.password, 10);
 
       // Inserir Admin da Empresa
       await tx.insert(users).values({
-        name: dto.adminName.trim(),
-        email,
+        name: dto.adminName,
+        email: dto.email,
         passwordHash,
         role: Role.ADMIN,
         tenantId: tenant.id,
@@ -132,7 +123,7 @@ export class UserService {
       const [admin] = await tx
         .select()
         .from(users)
-        .where(and(eq(users.tenantId, tenant.id), eq(users.email, email)))
+        .where(and(eq(users.tenantId, tenant.id), eq(users.email, dto.email)))
         .limit(1);
 
       // Emissão de tokens
@@ -146,7 +137,7 @@ export class UserService {
         .where(eq(users.id, admin.id));
 
       return {
-        user: this.sanitizeUser(admin),
+        user: toSafeUser(admin),
         accessToken,
         refreshToken,
       };
@@ -154,12 +145,10 @@ export class UserService {
   }
 
   async login(dto: LoginDto) {
-    const email = dto.email.trim().toLowerCase();
-
     const [user] = await this.db
       .select()
       .from(users)
-      .where(eq(users.email, email))
+      .where(eq(users.email, dto.email))
       .limit(1);
 
     if (!user) {
@@ -185,7 +174,7 @@ export class UserService {
       .where(eq(users.id, user.id));
 
     return {
-      user: this.sanitizeUser(user),
+      user: toSafeUser(user),
       accessToken,
       refreshToken,
     };
@@ -230,7 +219,7 @@ export class UserService {
       .where(eq(users.id, user.id));
 
     return {
-      user: this.sanitizeUser(user),
+      user: toSafeUser(user),
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
@@ -246,12 +235,10 @@ export class UserService {
   }
 
   async createEmployee(tenantId: string, dto: CreateUserDto) {
-    const email = dto.email.trim().toLowerCase();
-
     const [existing] = await this.db
       .select()
       .from(users)
-      .where(and(eq(users.tenantId, tenantId), eq(users.email, email)))
+      .where(and(eq(users.tenantId, tenantId), eq(users.email, dto.email)))
       .limit(1);
 
     if (existing) {
@@ -263,20 +250,18 @@ export class UserService {
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
     await this.db.insert(users).values({
-      name: dto.name.trim(),
-      email,
+      ...dto,
       passwordHash,
-      role: dto.role,
       tenantId,
     });
 
     const [created] = await this.db
       .select()
       .from(users)
-      .where(and(eq(users.tenantId, tenantId), eq(users.email, email)))
+      .where(and(eq(users.tenantId, tenantId), eq(users.email, dto.email)))
       .limit(1);
 
-    return this.sanitizeUser(created);
+    return toSafeUser(created);
   }
 
   async findMe(userId: string): Promise<UserResponseDto> {
@@ -290,7 +275,7 @@ export class UserService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    return this.sanitizeUser(user);
+    return toSafeUser(user);
   }
 
   async findAllByTenant(tenantId: string): Promise<UserResponseDto[]> {
@@ -300,7 +285,7 @@ export class UserService {
       .where(eq(users.tenantId, tenantId))
       .orderBy(desc(users.createdAt));
 
-    return list.map((u) => this.sanitizeUser(u));
+    return list.map(toSafeUser);
   }
 
   async update(
@@ -318,44 +303,36 @@ export class UserService {
       throw new NotFoundException('Colaborador não encontrado nesta empresa');
     }
 
-    if (dto.email) {
-      const newEmail = dto.email.trim().toLowerCase();
-      if (newEmail !== targetUser.email) {
-        const [existing] = await this.db
-          .select()
-          .from(users)
-          .where(
-            and(
-              eq(users.tenantId, tenantId),
-              eq(users.email, newEmail),
-              ne(users.id, targetUserId),
-            ),
-          )
-          .limit(1);
+    if (dto.email && dto.email !== targetUser.email) {
+      const [existing] = await this.db
+        .select()
+        .from(users)
+        .where(
+          and(
+            eq(users.tenantId, tenantId),
+            eq(users.email, dto.email),
+            ne(users.id, targetUserId),
+          ),
+        )
+        .limit(1);
 
-        if (existing) {
-          throw new ConflictException(
-            'Já existe outro colaborador com este e-mail nesta empresa',
-          );
-        }
+      if (existing) {
+        throw new ConflictException(
+          'Já existe outro colaborador com este e-mail nesta empresa',
+        );
       }
     }
 
-    const updateData: Partial<typeof users.$inferInsert> = {};
-
-    if (dto.name) {
-      updateData.name = dto.name.trim();
-    }
-    if (dto.email) {
-      updateData.email = dto.email.trim().toLowerCase();
-    }
-    if (dto.role) {
-      updateData.role = dto.role;
-    }
-    if (dto.password) {
-      updateData.passwordHash = await bcrypt.hash(dto.password, 10);
-      updateData.refreshTokenHash = null;
-    }
+    const { password, ...rest } = dto;
+    const updateData: Partial<typeof users.$inferInsert> = {
+      ...rest,
+      ...(password
+        ? {
+            passwordHash: await bcrypt.hash(password, 10),
+            refreshTokenHash: null,
+          }
+        : {}),
+    };
 
     if (Object.keys(updateData).length > 0) {
       await this.db
@@ -370,7 +347,7 @@ export class UserService {
       .where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId)))
       .limit(1);
 
-    return this.sanitizeUser(updated);
+    return toSafeUser(updated);
   }
 
   async remove(

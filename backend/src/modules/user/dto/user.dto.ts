@@ -5,18 +5,21 @@ import { Role } from '../../common/enums/role.enum';
 export const RegisterTenantSchema = z.object({
   companyName: z
     .string()
+    .trim()
     .min(2, 'O nome da empresa deve ter no mínimo 2 caracteres')
     .max(150, 'O nome da empresa deve ter no máximo 150 caracteres'),
   document: z
     .string()
+    .trim()
     .min(8, 'O documento deve ter no mínimo 8 caracteres')
     .max(20, 'O documento deve ter no máximo 20 caracteres')
     .regex(/^[a-zA-Z0-9.-/]+$/, 'Documento com formato inválido'),
   adminName: z
     .string()
+    .trim()
     .min(2, 'O nome do administrador deve ter no mínimo 2 caracteres')
     .max(100, 'O nome do administrador deve ter no máximo 100 caracteres'),
-  email: z.string().email('E-mail em formato inválido'),
+  email: z.string().trim().toLowerCase().email('E-mail em formato inválido'),
   password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
 });
 
@@ -25,9 +28,10 @@ export class RegisterTenantDto extends createZodDto(RegisterTenantSchema) {}
 export const CreateUserSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(2, 'O nome deve ter no mínimo 2 caracteres')
     .max(100, 'O nome deve ter no máximo 100 caracteres'),
-  email: z.string().email('E-mail em formato inválido'),
+  email: z.string().trim().toLowerCase().email('E-mail em formato inválido'),
   password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
   role: z
     .enum([Role.ADMIN, Role.MANAGER, Role.OPERATOR])
@@ -39,10 +43,16 @@ export class CreateUserDto extends createZodDto(CreateUserSchema) {}
 export const UpdateUserSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(2, 'O nome deve ter no mínimo 2 caracteres')
     .max(100, 'O nome deve ter no máximo 100 caracteres')
     .optional(),
-  email: z.string().email('E-mail em formato inválido').optional(),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email('E-mail em formato inválido')
+    .optional(),
   role: z.enum([Role.ADMIN, Role.MANAGER, Role.OPERATOR]).optional(),
   password: z
     .string()
@@ -53,7 +63,7 @@ export const UpdateUserSchema = z.object({
 export class UpdateUserDto extends createZodDto(UpdateUserSchema) {}
 
 export const LoginSchema = z.object({
-  email: z.string().email('E-mail em formato inválido'),
+  email: z.string().trim().toLowerCase().email('E-mail em formato inválido'),
   password: z.string().min(1, 'A senha é obrigatória'),
 });
 
@@ -71,8 +81,8 @@ export const UserResponseSchema = z.object({
   email: z.string(),
   role: z.string(),
   tenantId: z.string(),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional(),
+  createdAt: z.date().or(z.string()).optional(),
+  updatedAt: z.date().or(z.string()).optional(),
 });
 
 export class UserResponseDto extends createZodDto(UserResponseSchema) {}

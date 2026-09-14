@@ -4,18 +4,16 @@ import { DRIZZLE, type DrizzleDB } from '../database/database.module';
 import { tenants, Tenant } from './schemas/schema';
 import { CreateTenantDto, UpdateTenantDto } from './dto/tenant.dto';
 
-type TransactionClient = Parameters<Parameters<DrizzleDB['transaction']>[0]>[0];
-
 @Injectable()
 export class TenantService {
   constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
 
-  async create(dto: CreateTenantDto, tx?: TransactionClient | DrizzleDB): Promise<Tenant> {
-    const client = tx ?? this.db;
-    const document = dto.document.trim();
-
-    const [existing] = await client.select().from(tenants)
-      .where(eq(tenants.document, document)).limit(1);
+  async create(dto: CreateTenantDto): Promise<Tenant> {
+    const [existing] = await this.db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.document, dto.document))
+      .limit(1);
 
     if (existing) {
       throw new ConflictException(
@@ -23,13 +21,12 @@ export class TenantService {
       );
     }
 
-    await client.insert(tenants).values({
-      name: dto.name.trim(),
-      document,
-    });
+    await this.db.insert(tenants).values(dto);
 
-    const [created] = await client.select().from(tenants)
-      .where(eq(tenants.document, document))
+    const [created] = await this.db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.document, dto.document))
       .limit(1);
 
     return created;
@@ -52,8 +49,19 @@ export class TenantService {
   }
 
   async update(id: string, dto: UpdateTenantDto): Promise<Tenant> {
+    await this.findById(id);
+
     if (dto.document) {
-      const [existing] = await this.db.select().from(tenants).where(and(eq(tenants.document, dto.document.trim()), ne(tenants.id, id)),).limit(1);
+      const [existing] = await this.db
+        .select()
+        .from(tenants)
+        .where(
+          and(
+            eq(tenants.document, dto.document),
+            ne(tenants.id, id),
+          ),
+        )
+        .limit(1);
 
       if (existing) {
         throw new ConflictException(
@@ -62,12 +70,9 @@ export class TenantService {
       }
     }
 
-    await this.db.update(tenants)
-      .set({
-        ...(dto.name ? { name: dto.name.trim() } : {}),
-        ...(dto.document ? { document: dto.document.trim() } : {}),
-        ...(dto.status ? { status: dto.status } : {}),
-      })
+    await this.db
+      .update(tenants)
+      .set(dto)
       .where(eq(tenants.id, id));
 
     return this.findById(id);
