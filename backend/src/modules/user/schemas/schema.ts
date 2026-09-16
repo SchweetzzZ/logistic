@@ -3,7 +3,6 @@ import {
   varchar,
   timestamp,
   mysqlEnum,
-  uniqueIndex,
 } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
@@ -16,7 +15,7 @@ export const users = mysqlTable(
       .primaryKey()
       .$defaultFn(() => randomUUID()),
     name: varchar('name', { length: 100 }).notNull(),
-    email: varchar('email', { length: 255 }).notNull(),
+    email: varchar('email', { length: 255 }).notNull().unique(),
     passwordHash: varchar('password_hash', { length: 255 }).notNull(),
     role: mysqlEnum('role', ['ADMIN', 'MANAGER', 'OPERATOR'])
       .default('OPERATOR')
@@ -25,14 +24,13 @@ export const users = mysqlTable(
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
     refreshTokenHash: varchar('refresh_token_hash', { length: 255 }),
-    createdAt: timestamp('created_at')
+    createdAt: timestamp('created_at', { mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp('updated_at')
+    updatedAt: timestamp('updated_at', { mode: 'string' })
       .default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`)
       .notNull(),
   },
-  (table) => [uniqueIndex('tenant_email_idx').on(table.tenantId, table.email)],
 );
 
 export type User = typeof users.$inferSelect;

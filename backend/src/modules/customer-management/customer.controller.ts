@@ -47,10 +47,7 @@ export class CustomerManagementController {
     type: CustomerResponseDto,
     description: 'Cliente cadastrado com sucesso',
   })
-  async create(
-    @CurrentTenant() tenantId: string,
-    @Body() dto: CreateCustomerDto,
-  ): Promise<CustomerResponseDto> {
+  async create(@CurrentTenant() tenantId: string, @Body() dto: CreateCustomerDto): Promise<CustomerResponseDto> {
     return this.customerService.create(tenantId, dto);
   }
 
@@ -66,10 +63,7 @@ export class CustomerManagementController {
     type: [CustomerResponseDto],
     description: 'Lista de clientes do tenant atual',
   })
-  async findAll(
-    @CurrentTenant() tenantId: string,
-    @Query('search') search?: string,
-  ): Promise<CustomerResponseDto[]> {
+  async findAll(@CurrentTenant() tenantId: string, @Query('search') search?: string): Promise<CustomerResponseDto[]> {
     return this.customerService.findAll(tenantId, search);
   }
 
@@ -80,10 +74,7 @@ export class CustomerManagementController {
     type: CustomerResponseDto,
     description: 'Dados detalhados do cliente',
   })
-  async findById(
-    @CurrentTenant() tenantId: string,
-    @Param('id') id: string,
-  ): Promise<CustomerResponseDto> {
+  async findById(@CurrentTenant() tenantId: string, @Param('id') id: string): Promise<CustomerResponseDto> {
     return this.customerService.findById(tenantId, id);
   }
 
@@ -94,11 +85,7 @@ export class CustomerManagementController {
     type: CustomerResponseDto,
     description: 'Cliente atualizado com sucesso',
   })
-  async update(
-    @CurrentTenant() tenantId: string,
-    @Param('id') id: string,
-    @Body() dto: UpdateCustomerDto,
-  ): Promise<CustomerResponseDto> {
+  async update(@CurrentTenant() tenantId: string, @Param('id') id: string, @Body() dto: UpdateCustomerDto): Promise<CustomerResponseDto> {
     return this.customerService.update(tenantId, id, dto);
   }
 
@@ -109,10 +96,7 @@ export class CustomerManagementController {
     type: MessageResponseDto,
     description: 'Cliente removido com sucesso',
   })
-  async remove(
-    @CurrentTenant() tenantId: string,
-    @Param('id') id: string,
-  ): Promise<MessageResponseDto> {
+  async remove(@CurrentTenant() tenantId: string, @Param('id') id: string): Promise<MessageResponseDto> {
     return this.customerService.remove(tenantId, id);
   }
 }

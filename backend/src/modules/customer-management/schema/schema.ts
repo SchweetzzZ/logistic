@@ -16,8 +16,8 @@ export const customers = mysqlTable('customers', {
     city: varchar('city', { length: 100 }),
     state: varchar('state', { length: 20 }),
     tenantId: varchar('tenant_id', { length: 36 }).notNull().references(() => tenants.id, { onDelete: 'cascade' }),
-    createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
-    updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`).notNull(),
+    createdAt: timestamp('created_at', { mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+    updatedAt: timestamp('updated_at', { mode: 'string' }).default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`).notNull(),
 },
     (table) => [
         uniqueIndex('tenant_customer_cpf_idx').on(table.tenantId, table.cpf),

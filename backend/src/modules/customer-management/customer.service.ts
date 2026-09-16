@@ -69,25 +69,16 @@ export class CustomerManagementService {
     return customer;
   }
 
-  async update(
-    tenantId: string,
-    id: string,
-    dto: UpdateCustomerDto,
-  ): Promise<Customer> {
+  async update(tenantId: string, id: string, dto: UpdateCustomerDto): Promise<Customer> {
     const current = await this.findById(tenantId, id);
 
     if (dto.cpf && dto.cpf !== current.cpf) {
-      const [conflict] = await this.db
-        .select()
-        .from(customers)
-        .where(
-          and(
-            eq(customers.tenantId, tenantId),
-            eq(customers.cpf, dto.cpf),
-            ne(customers.id, id),
-          ),
-        )
-        .limit(1);
+      const [conflict] = await this.db.select().from(customers).where(
+        and(
+          eq(customers.tenantId, tenantId),
+          eq(customers.cpf, dto.cpf),
+          ne(customers.id, id)
+        )).limit(1);
 
       if (conflict) {
         throw new ConflictException(

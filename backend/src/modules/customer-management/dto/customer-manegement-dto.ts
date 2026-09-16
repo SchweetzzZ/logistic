@@ -43,8 +43,8 @@ export const customerResponseSchema = z.object({
   city: z.string().nullable().optional(),
   state: z.string().nullable().optional(),
   tenantId: z.string(),
-  createdAt: z.date().or(z.string()),
-  updatedAt: z.date().or(z.string()),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export class CustomerResponseDto extends createZodDto(customerResponseSchema) { }

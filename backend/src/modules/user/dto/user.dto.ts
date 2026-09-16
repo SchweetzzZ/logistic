@@ -81,8 +81,8 @@ export const UserResponseSchema = z.object({
   email: z.string(),
   role: z.string(),
   tenantId: z.string(),
-  createdAt: z.date().or(z.string()).optional(),
-  updatedAt: z.date().or(z.string()).optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
 });
 
 export class UserResponseDto extends createZodDto(UserResponseSchema) {}

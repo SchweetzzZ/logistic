@@ -28,8 +28,8 @@ export const TenantResponseSchema = z.object({
   name: z.string(),
   document: z.string(),
   status: z.string(),
-  createdAt: z.date().or(z.string()),
-  updatedAt: z.date().or(z.string()),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export class TenantResponseDto extends createZodDto(TenantResponseSchema) {}

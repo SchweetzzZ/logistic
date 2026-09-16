@@ -7,6 +7,7 @@ import { CommonModule } from './modules/common/common.module';
 import { TenantModule } from './modules/tenant/tenant.module';
 import { UserModule } from './modules/user/user.module';
 import { CustomerManagementModule } from './modules/customer-management/customer.module';
+import { CarrierManagementModule } from './modules/carrier-management/carrier.module';
 
 import { authConfig } from './config/auth.config';
 
@@ -22,6 +23,7 @@ import { authConfig } from './config/auth.config';
     TenantModule,
     UserModule,
     CustomerManagementModule,
+    CarrierManagementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

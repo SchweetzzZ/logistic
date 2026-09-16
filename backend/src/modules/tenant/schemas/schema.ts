@@ -7,8 +7,8 @@ export const tenants = mysqlTable('tenants', {
   name: varchar('name', { length: 150 }).notNull(),
   document: varchar('document', { length: 20 }).notNull().unique(),
   status: mysqlEnum('status', ['ACTIVE', 'INACTIVE', 'SUSPENDED']).default('ACTIVE').notNull(),
-  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
-  updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`).notNull(),
+  createdAt: timestamp('created_at', { mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'string' }).default(sql`CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`).notNull(),
 });
 
 export type Tenant = typeof tenants.$inferSelect;
