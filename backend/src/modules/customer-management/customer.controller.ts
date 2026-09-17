@@ -30,6 +30,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @ApiTags('Customers')
 @ApiBearerAuth()
@@ -47,8 +48,12 @@ export class CustomerManagementController {
     type: CustomerResponseDto,
     description: 'Cliente cadastrado com sucesso',
   })
-  async create(@CurrentTenant() tenantId: string, @Body() dto: CreateCustomerDto): Promise<CustomerResponseDto> {
-    return this.customerService.create(tenantId, dto);
+  async create(
+    @CurrentTenant() tenantId: string,
+    @CurrentUser('userId') userId: string,
+    @Body() dto: CreateCustomerDto,
+  ): Promise<CustomerResponseDto> {
+    return this.customerService.create(tenantId, dto, userId);
   }
 
   @Get()
@@ -85,8 +90,13 @@ export class CustomerManagementController {
     type: CustomerResponseDto,
     description: 'Cliente atualizado com sucesso',
   })
-  async update(@CurrentTenant() tenantId: string, @Param('id') id: string, @Body() dto: UpdateCustomerDto): Promise<CustomerResponseDto> {
-    return this.customerService.update(tenantId, id, dto);
+  async update(
+    @CurrentTenant() tenantId: string,
+    @CurrentUser('userId') userId: string,
+    @Param('id') id: string,
+    @Body() dto: UpdateCustomerDto,
+  ): Promise<CustomerResponseDto> {
+    return this.customerService.update(tenantId, id, dto, userId);
   }
 
   @Delete(':id')
@@ -96,7 +106,11 @@ export class CustomerManagementController {
     type: MessageResponseDto,
     description: 'Cliente removido com sucesso',
   })
-  async remove(@CurrentTenant() tenantId: string, @Param('id') id: string): Promise<MessageResponseDto> {
-    return this.customerService.remove(tenantId, id);
+  async remove(
+    @CurrentTenant() tenantId: string,
+    @CurrentUser('userId') userId: string,
+    @Param('id') id: string,
+  ): Promise<MessageResponseDto> {
+    return this.customerService.remove(tenantId, id, userId);
   }
 }

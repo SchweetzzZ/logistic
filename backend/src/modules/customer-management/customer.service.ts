@@ -3,12 +3,16 @@ import { eq, and, ne, desc, like, or } from 'drizzle-orm';
 import { DRIZZLE, type DrizzleDB } from '../database/database.module';
 import { customers, Customer } from './schema/schema';
 import { CreateCustomerDto, UpdateCustomerDto, } from './dto/customer-manegement-dto';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class CustomerManagementService {
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
+  constructor(
+    @Inject(DRIZZLE) private readonly db: DrizzleDB,
+    private readonly auditService: AuditService,
+  ) { }
 
-  async create(tenantId: string, dto: CreateCustomerDto): Promise<Customer> {
+  async create(tenantId: string, dto: CreateCustomerDto, userId?: string): Promise<Customer> {
     const [existing] = await this.db
       .select()
       .from(customers)
@@ -31,6 +35,21 @@ export class CustomerManagementService {
       .from(customers)
       .where(and(eq(customers.tenantId, tenantId), eq(customers.cpf, dto.cpf)))
       .limit(1);
+
+    await this.auditService.log({
+      tenantId,
+      userId: userId ?? null,
+      action: 'CUSTOMER_CREATE',
+      resource: 'customer',
+      resourceId: created.id,
+      details: {
+        name: created.name,
+        cpf: created.cpf,
+        email: created.email,
+        city: created.city,
+        state: created.state,
+      },
+    });
 
     return created;
   }
@@ -69,8 +88,20 @@ export class CustomerManagementService {
     return customer;
   }
 
-  async update(tenantId: string, id: string, dto: UpdateCustomerDto): Promise<Customer> {
+  async update(tenantId: string, id: string, dto: UpdateCustomerDto, userId?: string): Promise<Customer> {
     const current = await this.findById(tenantId, id);
+
+    const diff: Record<string, { from: any; to: any }> = {};
+    const fields = ['name', 'email', 'cpf', 'phone', 'zipCode', 'street', 'number', 'complement', 'city', 'state'] as const;
+    for (const field of fields) {
+      if (dto[field] !== undefined && dto[field] !== current[field]) {
+        diff[field] = { from: current[field], to: dto[field] };
+      }
+    }
+
+    if (Object.keys(diff).length === 0) {
+      return current;
+    }
 
     if (dto.cpf && dto.cpf !== current.cpf) {
       const [conflict] = await this.db.select().from(customers).where(
@@ -92,15 +123,41 @@ export class CustomerManagementService {
       .set(dto)
       .where(and(eq(customers.id, id), eq(customers.tenantId, tenantId)));
 
-    return this.findById(tenantId, id);
+    const updated = await this.findById(tenantId, id);
+
+    await this.auditService.log({
+      tenantId,
+      userId: userId ?? null,
+      action: 'CUSTOMER_UPDATE',
+      resource: 'customer',
+      resourceId: id,
+      details: {
+        customerName: updated.name,
+        diff,
+      },
+    });
+
+    return updated;
   }
 
-  async remove(tenantId: string, id: string): Promise<{ message: string }> {
-    await this.findById(tenantId, id);
+  async remove(tenantId: string, id: string, userId?: string): Promise<{ message: string }> {
+    const current = await this.findById(tenantId, id);
 
     await this.db
       .delete(customers)
       .where(and(eq(customers.id, id), eq(customers.tenantId, tenantId)));
+
+    await this.auditService.log({
+      tenantId,
+      userId: userId ?? null,
+      action: 'CUSTOMER_DELETE',
+      resource: 'customer',
+      resourceId: id,
+      details: {
+        customerName: current.name,
+        cpf: current.cpf,
+      },
+    });
 
     return { message: 'Cliente removido com sucesso' };
   }

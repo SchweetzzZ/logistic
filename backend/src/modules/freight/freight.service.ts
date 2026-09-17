@@ -1,7 +1,8 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { DRIZZLE, type DrizzleDB } from '../database/database.constants';
 import { carrierSchema, type Carrier } from '../carrier-management/schemas/schema';
+import { auditFreightSchema } from './schemas/schema';
 import { SimulateFreightDto } from './dto/freight.dto';
 import type { LocationInfo, FreightQuote, SimulationResult } from './dto/freight.types';
 
@@ -17,6 +18,8 @@ const CEP_RANGES: [number, number, string][] = [
 
 @Injectable()
 export class FreightService {
+  private readonly logger = new Logger(FreightService.name);
+
   constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
 
   /**
@@ -50,7 +53,11 @@ export class FreightService {
   /**
    * Executa a simulação completa de frete
    */
-  async simulateFreight(tenantId: string, dto: SimulateFreightDto): Promise<SimulationResult> {
+  async simulateFreight(
+    tenantId: string,
+    dto: SimulateFreightDto,
+    userId?: string,
+  ): Promise<SimulationResult> {
     // 1. Consulta de Origem e Destino em paralelo via BrasilAPI
     const [origin, destination] = await Promise.all([
       this.getZipCodeInfo(dto.originZipCode || '01001000'),
@@ -120,12 +127,76 @@ export class FreightService {
       })
       .sort((a, b) => a.totalPrice - b.totalPrice);
 
-    return {
+    const result: SimulationResult = {
       origin,
       destination,
       package: { actualWeightKg: dto.weight, volumetricWeightKg, chargedWeightKg, declaredValue: dto.declaredValue, dimensions: dto.dimensions },
       deliveryType,
       quotes,
+    };
+
+    // 7. Gravação de Auditoria do Histórico de Frete (Fail-safe)
+    try {
+      const cheapest = quotes[0];
+      await this.db.insert(auditFreightSchema).values({
+        tenantId,
+        userId: userId ?? null,
+        originZipCode: origin.zipCode,
+        destinationZipCode: destination.zipCode,
+        originCity: origin.city,
+        originState: origin.state,
+        destinationCity: destination.city,
+        destinationState: destination.state,
+        actualWeightKg: dto.weight.toString(),
+        volumetricWeightKg: volumetricWeightKg.toString(),
+        chargedWeightKg: chargedWeightKg.toString(),
+        declaredValue: dto.declaredValue.toString(),
+        dimensionsLength: length.toString(),
+        dimensionsWidth: width.toString(),
+        dimensionsHeight: height.toString(),
+        deliveryType,
+        cheapestCarrierId: cheapest?.carrierId ?? null,
+        cheapestCarrierName: cheapest?.carrierName ?? null,
+        cheapestPrice: cheapest ? cheapest.totalPrice.toString() : null,
+        cheapestDeadlineDays: cheapest?.deadlineDays ?? null,
+        quotes,
+      });
+    } catch (auditError: any) {
+      this.logger.error(
+        `Falha ao gravar histórico em audit_freight: ${auditError?.message || auditError}`,
+      );
+    }
+
+    return result;
+  }
+
+  /**
+   * Consulta paginada do histórico de simulações realizadas no tenant
+   */
+  async getHistory(tenantId: string, page = 1, limit = 20) {
+    const offset = (page - 1) * limit;
+
+    const [totalResult] = await this.db
+      .select({ count: sql<number>`count(*)` })
+      .from(auditFreightSchema)
+      .where(eq(auditFreightSchema.tenantId, tenantId));
+
+    const total = Number(totalResult?.count || 0);
+
+    const data = await this.db
+      .select()
+      .from(auditFreightSchema)
+      .where(eq(auditFreightSchema.tenantId, tenantId))
+      .orderBy(desc(auditFreightSchema.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit) || 1,
     };
   }
 }

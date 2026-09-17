@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth, } from '@nestjs/swagger';
 import { carrierService } from './carrier.service';
 import { CreateCarrierDto, UpdateCarrierDto } from './dto/carrier-dto';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -18,22 +19,35 @@ export class carrierController {
     @Post()
     @Roles(Role.ADMIN, Role.MANAGER)
     @ApiOperation({ summary: 'Cadastrar nova transportadora' })
-    async create(@CurrentTenant() tenantId: string, @Body() data: CreateCarrierDto,) {
-        return this.carrierService.create(tenantId, data);
+    async create(
+        @CurrentTenant() tenantId: string,
+        @CurrentUser('userId') userId: string,
+        @Body() data: CreateCarrierDto,
+    ) {
+        return this.carrierService.create(tenantId, data, userId);
     }
 
     @Patch(':id')
     @Roles(Role.ADMIN, Role.MANAGER)
     @ApiOperation({ summary: 'Atualizar transportadora' })
-    async update(@CurrentTenant() tenantId: string, @Param('id') id: string, @Body() data: UpdateCarrierDto,) {
-        return this.carrierService.update(tenantId, id, data);
+    async update(
+        @CurrentTenant() tenantId: string,
+        @CurrentUser('userId') userId: string,
+        @Param('id') id: string,
+        @Body() data: UpdateCarrierDto,
+    ) {
+        return this.carrierService.update(tenantId, id, data, userId);
     }
 
     @Delete(':id')
     @Roles(Role.ADMIN, Role.MANAGER)
     @ApiOperation({ summary: 'Remover transportadora' })
-    async remove(@CurrentTenant() tenantId: string, @Param('id') id: string,) {
-        return this.carrierService.remove(tenantId, id);
+    async remove(
+        @CurrentTenant() tenantId: string,
+        @CurrentUser('userId') userId: string,
+        @Param('id') id: string,
+    ) {
+        return this.carrierService.remove(tenantId, id, userId);
     }
 
     @Get()

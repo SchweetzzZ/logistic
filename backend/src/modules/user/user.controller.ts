@@ -102,10 +102,13 @@ export class UserController {
     description: 'Login bem-sucedido com cookies emitidos',
   })
   async login(
+    @Req() req: Request,
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponseDto> {
-    const result = await this.userService.login(dto);
+    const ipAddress = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || req.ip;
+    const userAgent = req.headers['user-agent'];
+    const result = await this.userService.login(dto, ipAddress, userAgent);
     this.setAuthCookies(res, result.accessToken, result.refreshToken);
     return {
       user: result.user,
@@ -154,11 +157,15 @@ export class UserController {
     description: 'Logout efetuado com sucesso',
   })
   async logout(
+    @Req() req: Request,
+    @CurrentTenant() tenantId: string,
     @CurrentUser('userId') userId: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<MessageResponseDto> {
+    const ipAddress = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || req.ip;
+    const userAgent = req.headers['user-agent'];
     this.clearAuthCookies(res);
-    return this.userService.logout(userId);
+    return this.userService.logout(userId, tenantId, ipAddress, userAgent);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -186,9 +193,10 @@ export class UserController {
   })
   async createEmployee(
     @CurrentTenant() tenantId: string,
+    @CurrentUser('userId') currentUserId: string,
     @Body() dto: CreateUserDto,
   ): Promise<UserResponseDto> {
-    return this.userService.createEmployee(tenantId, dto);
+    return this.userService.createEmployee(tenantId, dto, currentUserId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -221,10 +229,11 @@ export class UserController {
   })
   async updateEmployee(
     @CurrentTenant() tenantId: string,
+    @CurrentUser('userId') currentUserId: string,
     @Param('id') id: string,
     @Body() dto: UpdateUserDto,
   ): Promise<UserResponseDto> {
-    return this.userService.update(tenantId, id, dto);
+    return this.userService.update(tenantId, id, dto, currentUserId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

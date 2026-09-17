@@ -9,6 +9,7 @@ import { UserModule } from './modules/user/user.module';
 import { CustomerManagementModule } from './modules/customer-management/customer.module';
 import { CarrierManagementModule } from './modules/carrier-management/carrier.module';
 import { FreightModule } from './modules/freight/freight.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 import { authConfig } from './config/auth.config';
 
@@ -21,6 +22,7 @@ import { authConfig } from './config/auth.config';
     }),
     DatabaseModule,
     CommonModule,
+    AuditModule,
     TenantModule,
     UserModule,
     CustomerManagementModule,

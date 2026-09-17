@@ -2,15 +2,24 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { FreightService } from './freight.service';
 import { DRIZZLE } from '../database/database.constants';
+import { auditFreightSchema } from './schemas/schema';
 
 describe('FreightService', () => {
   let service: FreightService;
+  const mockInsertValues = jest.fn().mockResolvedValue({});
   const mockDb = {
     select: jest.fn(),
+    insert: jest.fn().mockReturnValue({
+      values: mockInsertValues,
+    }),
   };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockDb.insert.mockReturnValue({
+      values: mockInsertValues,
+    });
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         FreightService,
@@ -21,7 +30,7 @@ describe('FreightService', () => {
     service = module.get<FreightService>(FreightService);
   });
 
-  it('deve priorizar o peso cubado quando este for maior que o peso real', async () => {
+  it('deve priorizar o peso cubado quando este for maior que o peso real e gravar auditoria', async () => {
     // 50x50x50 cm = 125.000 cm³ -> 125.000 / 6000 = ~20.833 kg cubado
     // Peso real: 5 kg -> Deve cobrar 20.833 kg
     const mockCarriers = [
@@ -46,11 +55,20 @@ describe('FreightService', () => {
       weight: 5,
       dimensions: { length: 50, width: 50, height: 50 },
       declaredValue: 1000,
-    });
+    }, 'user-123');
 
     expect(result.package.chargedWeightKg).toBeCloseTo(20.833, 2);
     expect(result.deliveryType).toBe('LOCAL');
     expect(result.quotes[0].breakdown.insuranceCost).toBe(5); // 1000 * 0.005
+
+    // Verifica se gravou na tabela audit_freight
+    expect(mockDb.insert).toHaveBeenCalledWith(auditFreightSchema);
+    expect(mockInsertValues).toHaveBeenCalledWith(expect.objectContaining({
+      tenantId: 'tenant-1',
+      userId: 'user-123',
+      deliveryType: 'LOCAL',
+      cheapestCarrierName: 'Express Log',
+    }));
   });
 
   it('deve calcular frete interestadual com multiplicador 1.5x e dias extras', async () => {
@@ -81,11 +99,8 @@ describe('FreightService', () => {
 
     expect(result.deliveryType).toBe('INTERSTATE');
     expect(result.quotes[0].deadlineDays).toBe(6); // 3 + 3
-    // weightCost = 10 * 5 = 50
-    // subtotal = (20 + 50) * 1.5 = 105
-    // insurance = 500 * 0.005 = 2.5
-    // total = 107.5
     expect(result.quotes[0].totalPrice).toBe(107.5);
+    expect(mockDb.insert).toHaveBeenCalledWith(auditFreightSchema);
   });
 
   it('deve lançar NotFoundException quando nenhuma transportadora ativa for encontrada', async () => {
@@ -109,5 +124,31 @@ describe('FreightService', () => {
         declaredValue: 100,
       }),
     ).rejects.toThrow(NotFoundException);
+  });
+
+  it('deve consultar o histórico de simulações com paginação', async () => {
+    const mockHistoryData = [{ id: 'audit-1', originZipCode: '01001000' }];
+    mockDb.select
+      .mockReturnValueOnce({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockResolvedValue([{ count: 1 }]),
+        }),
+      })
+      .mockReturnValueOnce({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            orderBy: jest.fn().mockReturnValue({
+              limit: jest.fn().mockReturnValue({
+                offset: jest.fn().mockResolvedValue(mockHistoryData),
+              }),
+            }),
+          }),
+        }),
+      });
+
+    const result = await service.getHistory('tenant-1', 1, 10);
+    expect(result.total).toBe(1);
+    expect(result.data).toEqual(mockHistoryData);
+    expect(result.totalPages).toBe(1);
   });
 });

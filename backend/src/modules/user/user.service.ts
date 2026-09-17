@@ -9,6 +9,7 @@ import { tenants } from '../tenant/schemas/schema';
 import { Role } from '../common/enums/role.enum';
 import { authConfig } from '../../config/auth.config';
 import { RegisterTenantDto, CreateUserDto, UpdateUserDto, LoginDto, UserResponseDto } from './dto/user.dto';
+import { AuditService } from '../audit/audit.service';
 
 const toSafeUser = ({ passwordHash, refreshTokenHash, ...user }: User): UserResponseDto => user;
 
@@ -19,6 +20,7 @@ export class UserService {
     private readonly jwtService: JwtService,
     @Inject(authConfig.KEY)
     private readonly authConfiguration: ConfigType<typeof authConfig>,
+    private readonly auditService: AuditService,
   ) { }
 
   private generateTokens(user: User) {
@@ -101,7 +103,7 @@ export class UserService {
     });
   }
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto, ipAddress?: string, userAgent?: string) {
     const [user] = await this.db.select().from(users)
       .where(eq(users.email, dto.email))
       .limit(1);
@@ -124,6 +126,17 @@ export class UserService {
     // Hash e rotação do refresh token
     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
     await this.db.update(users).set({ refreshTokenHash }).where(eq(users.id, user.id));
+
+    await this.auditService.log({
+      tenantId: user.tenantId,
+      userId: user.id,
+      action: 'AUTH_LOGIN',
+      resource: 'auth',
+      resourceId: user.id,
+      ipAddress,
+      userAgent,
+      details: { email: user.email, role: user.role },
+    });
 
     return {
       user: toSafeUser(user),
@@ -170,13 +183,23 @@ export class UserService {
     };
   }
 
-  async logout(userId: string) {
+  async logout(userId: string, tenantId?: string, ipAddress?: string, userAgent?: string) {
     await this.db.update(users).set({ refreshTokenHash: null }).where(eq(users.id, userId));
+
+    await this.auditService.log({
+      tenantId: tenantId ?? null,
+      userId,
+      action: 'AUTH_LOGOUT',
+      resource: 'auth',
+      resourceId: userId,
+      ipAddress,
+      userAgent,
+    });
 
     return { message: 'Logout realizado com sucesso' };
   }
 
-  async createEmployee(tenantId: string, dto: CreateUserDto) {
+  async createEmployee(tenantId: string, dto: CreateUserDto, currentUserId?: string) {
     const [existing] = await this.db.select().from(users).where(and(eq(users.tenantId, tenantId), eq(users.email, dto.email))).limit(1);
 
     if (existing) {
@@ -194,6 +217,15 @@ export class UserService {
     });
 
     const [created] = await this.db.select().from(users).where(and(eq(users.tenantId, tenantId), eq(users.email, dto.email))).limit(1);
+
+    await this.auditService.log({
+      tenantId,
+      userId: currentUserId ?? null,
+      action: 'USER_CREATE',
+      resource: 'user',
+      resourceId: created.id,
+      details: { name: created.name, email: created.email, role: created.role },
+    });
 
     return toSafeUser(created);
   }
@@ -214,7 +246,7 @@ export class UserService {
     return list.map(toSafeUser);
   }
 
-  async update(tenantId: string, targetUserId: string, dto: UpdateUserDto,): Promise<UserResponseDto> {
+  async update(tenantId: string, targetUserId: string, dto: UpdateUserDto, currentUserId?: string): Promise<UserResponseDto> {
     const [targetUser] = await this.db.select().from(users).where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId))).limit(1);
 
     if (!targetUser) {
@@ -238,6 +270,26 @@ export class UserService {
       }
     }
 
+    // 1. Calcular diff real apenas dos campos efetivamente modificados
+    const diff: Record<string, { from: any; to: any }> = {};
+    if (dto.name !== undefined && dto.name !== targetUser.name) {
+      diff.name = { from: targetUser.name, to: dto.name };
+    }
+    if (dto.email !== undefined && dto.email !== targetUser.email) {
+      diff.email = { from: targetUser.email, to: dto.email };
+    }
+    if (dto.role !== undefined && dto.role !== targetUser.role) {
+      diff.role = { from: targetUser.role, to: dto.role };
+    }
+    if (dto.password !== undefined) {
+      diff.password = { from: '[ANTERIOR]', to: '[REDEFINIDA]' };
+    }
+
+    // Se nenhum campo foi modificado, encerra sem alterar banco nem gerar log
+    if (Object.keys(diff).length === 0) {
+      return toSafeUser(targetUser);
+    }
+
     const { password, ...rest } = dto;
     const updateData: Partial<typeof users.$inferInsert> = {
       ...rest,
@@ -249,19 +301,30 @@ export class UserService {
         : {}),
     };
 
-    if (Object.keys(updateData).length > 0) {
-      await this.db
-        .update(users)
-        .set(updateData)
-        .where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId)));
-    }
+    await this.db
+      .update(users)
+      .set(updateData)
+      .where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId)));
 
     const [updated] = await this.db.select().from(users).where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId))).limit(1);
+
+    const isRoleChanged = Boolean(diff.role);
+
+    await this.auditService.log({
+      tenantId,
+      userId: currentUserId ?? null,
+      action: isRoleChanged ? 'USER_ROLE_CHANGE' : 'USER_UPDATE',
+      resource: 'user',
+      resourceId: targetUserId,
+      details: {
+        diff,
+      },
+    });
 
     return toSafeUser(updated);
   }
 
-  async remove(tenantId: string, currentUserId: string, targetUserId: string,): Promise<{ message: string }> {
+  async remove(tenantId: string, currentUserId: string, targetUserId: string): Promise<{ message: string }> {
     if (currentUserId === targetUserId) {
       throw new BadRequestException('Você não pode remover seu próprio usuário da sessão');
     }
@@ -275,6 +338,19 @@ export class UserService {
     await this.db
       .delete(users)
       .where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId)));
+
+    await this.auditService.log({
+      tenantId,
+      userId: currentUserId,
+      action: 'USER_DELETE',
+      resource: 'user',
+      resourceId: targetUserId,
+      details: {
+        removedUserName: targetUser.name,
+        removedUserEmail: targetUser.email,
+        removedUserRole: targetUser.role,
+      },
+    });
 
     return { message: 'Colaborador removido com sucesso' };
   }
