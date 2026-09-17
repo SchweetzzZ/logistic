@@ -12,7 +12,7 @@ export const CreateTenantSchema = z.object({
     .trim()
     .min(8, 'O documento deve ter no mínimo 8 caracteres')
     .max(20, 'O documento deve ter no máximo 20 caracteres')
-    .regex(/^[a-zA-Z0-9.-/]+$/, 'Documento com formato inválido'),
+    .regex(/^[a-zA-Z0-9.\-/]+$/, 'Documento com formato inválido'),
 });
 
 export class CreateTenantDto extends createZodDto(CreateTenantSchema) {}

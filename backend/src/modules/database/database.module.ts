@@ -3,10 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { drizzle, MySql2Database } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
 
-import { schema, DatabaseSchema } from './schema';
+import { schema } from './schema';
+import { DRIZZLE, type DrizzleDB } from './database.constants';
 
-export const DRIZZLE = 'DRIZZLE';
-export type DrizzleDB = MySql2Database<DatabaseSchema>;
+export * from './database.constants';
 
 @Global()
 @Module({

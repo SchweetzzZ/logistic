@@ -8,6 +8,7 @@ import { TenantModule } from './modules/tenant/tenant.module';
 import { UserModule } from './modules/user/user.module';
 import { CustomerManagementModule } from './modules/customer-management/customer.module';
 import { CarrierManagementModule } from './modules/carrier-management/carrier.module';
+import { FreightModule } from './modules/freight/freight.module';
 
 import { authConfig } from './config/auth.config';
 
@@ -24,6 +25,7 @@ import { authConfig } from './config/auth.config';
     UserModule,
     CustomerManagementModule,
     CarrierManagementModule,
+    FreightModule,
   ],
   controllers: [AppController],
   providers: [AppService],
