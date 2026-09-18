@@ -1,8 +1,16 @@
-import { Injectable, Inject, ConflictException, NotFoundException, } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { eq, and, ne, desc, like, or } from 'drizzle-orm';
 import { DRIZZLE, type DrizzleDB } from '../database/database.module';
 import { customers, Customer } from './schema/schema';
-import { CreateCustomerDto, UpdateCustomerDto, } from './dto/customer-manegement-dto';
+import {
+  CreateCustomerDto,
+  UpdateCustomerDto,
+} from './dto/customer-manegement-dto';
 import { AuditService } from '../audit/audit.service';
 
 @Injectable()
@@ -10,9 +18,13 @@ export class CustomerManagementService {
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDB,
     private readonly auditService: AuditService,
-  ) { }
+  ) {}
 
-  async create(tenantId: string, dto: CreateCustomerDto, userId?: string): Promise<Customer> {
+  async create(
+    tenantId: string,
+    dto: CreateCustomerDto,
+    userId?: string,
+  ): Promise<Customer> {
     const [existing] = await this.db
       .select()
       .from(customers)
@@ -57,10 +69,10 @@ export class CustomerManagementService {
   async findAll(tenantId: string, search?: string): Promise<Customer[]> {
     const searchFilter = search?.trim()
       ? or(
-        like(customers.name, `%${search.trim()}%`),
-        like(customers.cpf, `%${search.trim()}%`),
-        like(customers.email, `%${search.trim()}%`),
-      )
+          like(customers.name, `%${search.trim()}%`),
+          like(customers.cpf, `%${search.trim()}%`),
+          like(customers.email, `%${search.trim()}%`),
+        )
       : undefined;
 
     const whereClause = searchFilter
@@ -88,11 +100,27 @@ export class CustomerManagementService {
     return customer;
   }
 
-  async update(tenantId: string, id: string, dto: UpdateCustomerDto, userId?: string): Promise<Customer> {
+  async update(
+    tenantId: string,
+    id: string,
+    dto: UpdateCustomerDto,
+    userId?: string,
+  ): Promise<Customer> {
     const current = await this.findById(tenantId, id);
 
     const diff: Record<string, { from: any; to: any }> = {};
-    const fields = ['name', 'email', 'cpf', 'phone', 'zipCode', 'street', 'number', 'complement', 'city', 'state'] as const;
+    const fields = [
+      'name',
+      'email',
+      'cpf',
+      'phone',
+      'zipCode',
+      'street',
+      'number',
+      'complement',
+      'city',
+      'state',
+    ] as const;
     for (const field of fields) {
       if (dto[field] !== undefined && dto[field] !== current[field]) {
         diff[field] = { from: current[field], to: dto[field] };
@@ -104,12 +132,17 @@ export class CustomerManagementService {
     }
 
     if (dto.cpf && dto.cpf !== current.cpf) {
-      const [conflict] = await this.db.select().from(customers).where(
-        and(
-          eq(customers.tenantId, tenantId),
-          eq(customers.cpf, dto.cpf),
-          ne(customers.id, id)
-        )).limit(1);
+      const [conflict] = await this.db
+        .select()
+        .from(customers)
+        .where(
+          and(
+            eq(customers.tenantId, tenantId),
+            eq(customers.cpf, dto.cpf),
+            ne(customers.id, id),
+          ),
+        )
+        .limit(1);
 
       if (conflict) {
         throw new ConflictException(
@@ -140,7 +173,11 @@ export class CustomerManagementService {
     return updated;
   }
 
-  async remove(tenantId: string, id: string, userId?: string): Promise<{ message: string }> {
+  async remove(
+    tenantId: string,
+    id: string,
+    userId?: string,
+  ): Promise<{ message: string }> {
     const current = await this.findById(tenantId, id);
 
     await this.db

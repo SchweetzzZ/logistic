@@ -21,10 +21,7 @@ describe('FreightService', () => {
     });
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        FreightService,
-        { provide: DRIZZLE, useValue: mockDb },
-      ],
+      providers: [FreightService, { provide: DRIZZLE, useValue: mockDb }],
     }).compile();
 
     service = module.get<FreightService>(FreightService);
@@ -34,7 +31,15 @@ describe('FreightService', () => {
     // 50x50x50 cm = 125.000 cm³ -> 125.000 / 6000 = ~20.833 kg cubado
     // Peso real: 5 kg -> Deve cobrar 20.833 kg
     const mockCarriers = [
-      { id: '1', name: 'Express Log', basePrice: '10.00', pricePerKg: '2.00', deadlineDays: 2, status: 'ACTIVE', tenantId: 'tenant-1' },
+      {
+        id: '1',
+        name: 'Express Log',
+        basePrice: '10.00',
+        pricePerKg: '2.00',
+        deadlineDays: 2,
+        status: 'ACTIVE',
+        tenantId: 'tenant-1',
+      },
     ];
 
     mockDb.select.mockReturnValue({
@@ -49,13 +54,17 @@ describe('FreightService', () => {
       state: 'SP',
     }));
 
-    const result = await service.simulateFreight('tenant-1', {
-      destinationZipCode: '01001000',
-      originZipCode: '01001000',
-      weight: 5,
-      dimensions: { length: 50, width: 50, height: 50 },
-      declaredValue: 1000,
-    }, 'user-123');
+    const result = await service.simulateFreight(
+      'tenant-1',
+      {
+        destinationZipCode: '01001000',
+        originZipCode: '01001000',
+        weight: 5,
+        dimensions: { length: 50, width: 50, height: 50 },
+        declaredValue: 1000,
+      },
+      'user-123',
+    );
 
     expect(result.package.chargedWeightKg).toBeCloseTo(20.833, 2);
     expect(result.deliveryType).toBe('LOCAL');
@@ -63,17 +72,27 @@ describe('FreightService', () => {
 
     // Verifica se gravou na tabela audit_freight
     expect(mockDb.insert).toHaveBeenCalledWith(auditFreightSchema);
-    expect(mockInsertValues).toHaveBeenCalledWith(expect.objectContaining({
-      tenantId: 'tenant-1',
-      userId: 'user-123',
-      deliveryType: 'LOCAL',
-      cheapestCarrierName: 'Express Log',
-    }));
+    expect(mockInsertValues).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tenantId: 'tenant-1',
+        userId: 'user-123',
+        deliveryType: 'LOCAL',
+        cheapestCarrierName: 'Express Log',
+      }),
+    );
   });
 
   it('deve calcular frete interestadual com multiplicador 1.5x e dias extras', async () => {
     const mockCarriers = [
-      { id: '1', name: 'Interstate Cargo', basePrice: '20.00', pricePerKg: '5.00', deadlineDays: 3, status: 'ACTIVE', tenantId: 'tenant-1' },
+      {
+        id: '1',
+        name: 'Interstate Cargo',
+        basePrice: '20.00',
+        pricePerKg: '5.00',
+        deadlineDays: 3,
+        status: 'ACTIVE',
+        tenantId: 'tenant-1',
+      },
     ];
 
     mockDb.select.mockReturnValue({

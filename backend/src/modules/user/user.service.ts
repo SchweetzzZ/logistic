@@ -1,4 +1,11 @@
-import { Injectable, Inject, ConflictException, UnauthorizedException, NotFoundException, BadRequestException, } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  ConflictException,
+  UnauthorizedException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { type ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { eq, and, desc, ne } from 'drizzle-orm';
@@ -8,10 +15,20 @@ import { users, User } from './schemas/schema';
 import { tenants } from '../tenant/schemas/schema';
 import { Role } from '../common/enums/role.enum';
 import { authConfig } from '../../config/auth.config';
-import { RegisterTenantDto, CreateUserDto, UpdateUserDto, LoginDto, UserResponseDto } from './dto/user.dto';
+import {
+  RegisterTenantDto,
+  CreateUserDto,
+  UpdateUserDto,
+  LoginDto,
+  UserResponseDto,
+} from './dto/user.dto';
 import { AuditService } from '../audit/audit.service';
 
-const toSafeUser = ({ passwordHash, refreshTokenHash, ...user }: User): UserResponseDto => user;
+const toSafeUser = ({
+  passwordHash,
+  refreshTokenHash,
+  ...user
+}: User): UserResponseDto => user;
 
 @Injectable()
 export class UserService {
@@ -21,7 +38,7 @@ export class UserService {
     @Inject(authConfig.KEY)
     private readonly authConfiguration: ConfigType<typeof authConfig>,
     private readonly auditService: AuditService,
-  ) { }
+  ) {}
 
   private generateTokens(user: User) {
     const payload = {
@@ -51,7 +68,9 @@ export class UserService {
 
   async register(dto: RegisterTenantDto) {
     // 1. Verificar se já existe empresa com este documento
-    const [existingTenant] = await this.db.select().from(tenants)
+    const [existingTenant] = await this.db
+      .select()
+      .from(tenants)
       .where(eq(tenants.document, dto.document))
       .limit(1);
 
@@ -69,7 +88,9 @@ export class UserService {
         document: dto.document,
       });
 
-      const [tenant] = await tx.select().from(tenants)
+      const [tenant] = await tx
+        .select()
+        .from(tenants)
         .where(eq(tenants.document, dto.document))
         .limit(1);
 
@@ -84,7 +105,9 @@ export class UserService {
         tenantId: tenant.id,
       });
 
-      const [admin] = await tx.select().from(users)
+      const [admin] = await tx
+        .select()
+        .from(users)
         .where(and(eq(users.tenantId, tenant.id), eq(users.email, dto.email)))
         .limit(1);
 
@@ -93,7 +116,10 @@ export class UserService {
 
       // Armazenar hash do refresh token
       const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
-      await tx.update(users).set({ refreshTokenHash }).where(eq(users.id, admin.id));
+      await tx
+        .update(users)
+        .set({ refreshTokenHash })
+        .where(eq(users.id, admin.id));
 
       return {
         user: toSafeUser(admin),
@@ -104,7 +130,9 @@ export class UserService {
   }
 
   async login(dto: LoginDto, ipAddress?: string, userAgent?: string) {
-    const [user] = await this.db.select().from(users)
+    const [user] = await this.db
+      .select()
+      .from(users)
       .where(eq(users.email, dto.email))
       .limit(1);
 
@@ -125,7 +153,10 @@ export class UserService {
 
     // Hash e rotação do refresh token
     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
-    await this.db.update(users).set({ refreshTokenHash }).where(eq(users.id, user.id));
+    await this.db
+      .update(users)
+      .set({ refreshTokenHash })
+      .where(eq(users.id, user.id));
 
     await this.auditService.log({
       tenantId: user.tenantId,
@@ -159,7 +190,11 @@ export class UserService {
       throw new UnauthorizedException('Refresh token expirado ou inválido');
     }
 
-    const [user] = await this.db.select().from(users).where(eq(users.id, payload.sub)).limit(1);
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.id, payload.sub))
+      .limit(1);
 
     if (!user || !user.refreshTokenHash) {
       throw new UnauthorizedException('Sessão revogada ou usuário inexistente');
@@ -174,7 +209,10 @@ export class UserService {
     const tokens = this.generateTokens(user);
     const newRefreshTokenHash = await bcrypt.hash(tokens.refreshToken, 10);
 
-    await this.db.update(users).set({ refreshTokenHash: newRefreshTokenHash }).where(eq(users.id, user.id));
+    await this.db
+      .update(users)
+      .set({ refreshTokenHash: newRefreshTokenHash })
+      .where(eq(users.id, user.id));
 
     return {
       user: toSafeUser(user),
@@ -183,8 +221,16 @@ export class UserService {
     };
   }
 
-  async logout(userId: string, tenantId?: string, ipAddress?: string, userAgent?: string) {
-    await this.db.update(users).set({ refreshTokenHash: null }).where(eq(users.id, userId));
+  async logout(
+    userId: string,
+    tenantId?: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
+    await this.db
+      .update(users)
+      .set({ refreshTokenHash: null })
+      .where(eq(users.id, userId));
 
     await this.auditService.log({
       tenantId: tenantId ?? null,
@@ -199,8 +245,16 @@ export class UserService {
     return { message: 'Logout realizado com sucesso' };
   }
 
-  async createEmployee(tenantId: string, dto: CreateUserDto, currentUserId?: string) {
-    const [existing] = await this.db.select().from(users).where(and(eq(users.tenantId, tenantId), eq(users.email, dto.email))).limit(1);
+  async createEmployee(
+    tenantId: string,
+    dto: CreateUserDto,
+    currentUserId?: string,
+  ) {
+    const [existing] = await this.db
+      .select()
+      .from(users)
+      .where(and(eq(users.tenantId, tenantId), eq(users.email, dto.email)))
+      .limit(1);
 
     if (existing) {
       throw new ConflictException(
@@ -216,7 +270,11 @@ export class UserService {
       tenantId,
     });
 
-    const [created] = await this.db.select().from(users).where(and(eq(users.tenantId, tenantId), eq(users.email, dto.email))).limit(1);
+    const [created] = await this.db
+      .select()
+      .from(users)
+      .where(and(eq(users.tenantId, tenantId), eq(users.email, dto.email)))
+      .limit(1);
 
     await this.auditService.log({
       tenantId,
@@ -231,7 +289,11 @@ export class UserService {
   }
 
   async findMe(userId: string): Promise<UserResponseDto> {
-    const [user] = await this.db.select().from(users).where(eq(users.id, userId)).limit(1);
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
 
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
@@ -241,26 +303,42 @@ export class UserService {
   }
 
   async findAllByTenant(tenantId: string): Promise<UserResponseDto[]> {
-    const list = await this.db.select().from(users).where(eq(users.tenantId, tenantId)).orderBy(desc(users.createdAt));
+    const list = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.tenantId, tenantId))
+      .orderBy(desc(users.createdAt));
 
     return list.map(toSafeUser);
   }
 
-  async update(tenantId: string, targetUserId: string, dto: UpdateUserDto, currentUserId?: string): Promise<UserResponseDto> {
-    const [targetUser] = await this.db.select().from(users).where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId))).limit(1);
+  async update(
+    tenantId: string,
+    targetUserId: string,
+    dto: UpdateUserDto,
+    currentUserId?: string,
+  ): Promise<UserResponseDto> {
+    const [targetUser] = await this.db
+      .select()
+      .from(users)
+      .where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId)))
+      .limit(1);
 
     if (!targetUser) {
       throw new NotFoundException('Colaborador não encontrado nesta empresa');
     }
 
     if (dto.email && dto.email !== targetUser.email) {
-      const [existing] = await this.db.select().from(users).where(
-        and(
-          eq(users.tenantId, tenantId),
-          eq(users.email, dto.email),
-          ne(users.id, targetUserId),
-        ),
-      )
+      const [existing] = await this.db
+        .select()
+        .from(users)
+        .where(
+          and(
+            eq(users.tenantId, tenantId),
+            eq(users.email, dto.email),
+            ne(users.id, targetUserId),
+          ),
+        )
         .limit(1);
 
       if (existing) {
@@ -295,9 +373,9 @@ export class UserService {
       ...rest,
       ...(password
         ? {
-          passwordHash: await bcrypt.hash(password, 10),
-          refreshTokenHash: null,
-        }
+            passwordHash: await bcrypt.hash(password, 10),
+            refreshTokenHash: null,
+          }
         : {}),
     };
 
@@ -306,7 +384,11 @@ export class UserService {
       .set(updateData)
       .where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId)));
 
-    const [updated] = await this.db.select().from(users).where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId))).limit(1);
+    const [updated] = await this.db
+      .select()
+      .from(users)
+      .where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId)))
+      .limit(1);
 
     const isRoleChanged = Boolean(diff.role);
 
@@ -324,12 +406,22 @@ export class UserService {
     return toSafeUser(updated);
   }
 
-  async remove(tenantId: string, currentUserId: string, targetUserId: string): Promise<{ message: string }> {
+  async remove(
+    tenantId: string,
+    currentUserId: string,
+    targetUserId: string,
+  ): Promise<{ message: string }> {
     if (currentUserId === targetUserId) {
-      throw new BadRequestException('Você não pode remover seu próprio usuário da sessão');
+      throw new BadRequestException(
+        'Você não pode remover seu próprio usuário da sessão',
+      );
     }
 
-    const [targetUser] = await this.db.select().from(users).where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId))).limit(1);
+    const [targetUser] = await this.db
+      .select()
+      .from(users)
+      .where(and(eq(users.id, targetUserId), eq(users.tenantId, tenantId)))
+      .limit(1);
 
     if (!targetUser) {
       throw new NotFoundException('Colaborador não encontrado nesta empresa');

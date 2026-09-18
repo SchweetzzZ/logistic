@@ -42,7 +42,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 @ApiTags('Users & Auth')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   private setAuthCookies(
     res: Response,
@@ -106,7 +106,10 @@ export class UserController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponseDto> {
-    const ipAddress = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || req.ip;
+    const ipAddress =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.socket.remoteAddress ||
+      req.ip;
     const userAgent = req.headers['user-agent'];
     const result = await this.userService.login(dto, ipAddress, userAgent);
     this.setAuthCookies(res, result.accessToken, result.refreshToken);
@@ -162,7 +165,10 @@ export class UserController {
     @CurrentUser('userId') userId: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<MessageResponseDto> {
-    const ipAddress = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || req.ip;
+    const ipAddress =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.socket.remoteAddress ||
+      req.ip;
     const userAgent = req.headers['user-agent'];
     this.clearAuthCookies(res);
     return this.userService.logout(userId, tenantId, ipAddress, userAgent);

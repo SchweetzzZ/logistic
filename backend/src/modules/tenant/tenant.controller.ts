@@ -18,7 +18,7 @@ import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('tenant')
 export class TenantController {
-  constructor(private readonly tenantService: TenantService) { }
+  constructor(private readonly tenantService: TenantService) {}
 
   @Get('current')
   @ApiOperation({ summary: 'Obter dados da empresa (tenant) da sessão atual' })

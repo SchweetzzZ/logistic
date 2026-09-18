@@ -20,10 +20,7 @@ describe('AuditService', () => {
     });
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuditService,
-        { provide: DRIZZLE, useValue: mockDb },
-      ],
+      providers: [AuditService, { provide: DRIZZLE, useValue: mockDb }],
     }).compile();
 
     service = module.get<AuditService>(AuditService);
@@ -41,12 +38,14 @@ describe('AuditService', () => {
     });
 
     expect(mockDb.insert).toHaveBeenCalledWith(auditLogsSchema);
-    expect(mockInsertValues).toHaveBeenCalledWith(expect.objectContaining({
-      tenantId: 'tenant-1',
-      userId: 'user-1',
-      action: 'AUTH_LOGIN',
-      resource: 'auth',
-    }));
+    expect(mockInsertValues).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tenantId: 'tenant-1',
+        userId: 'user-1',
+        action: 'AUTH_LOGIN',
+        resource: 'auth',
+      }),
+    );
   });
 
   it('não deve lançar exceção se a inserção de auditoria falhar (resiliência fail-safe)', async () => {

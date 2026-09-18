@@ -24,14 +24,16 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@nestjs/bullmq": "^11.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^12.0.0",
     "@nestjs/core": "^11.0.1",
-    "@nestjs/jwt": "^12.0.1",
-    "@nestjs/passport": "^12.0.0",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.4.7",
     "bcrypt": "^6.0.0",
+    "bullmq": "^5.41.0",
     "cookie-parser": "^1.4.7",
     "drizzle-orm": "^0.45.2",
     "mysql2": "^3.24.4",

@@ -1,5 +1,10 @@
 import { Controller, Post, Get, Body, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { FreightService } from './freight.service';
 import { SimulateFreightDto } from './dto/freight.dto';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
@@ -14,7 +19,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('freight')
 export class FreightController {
-  constructor(private readonly freightService: FreightService) { }
+  constructor(private readonly freightService: FreightService) {}
 
   @Post('simulate')
   @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)

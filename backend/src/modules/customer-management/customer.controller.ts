@@ -37,9 +37,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('customers')
 export class CustomerManagementController {
-  constructor(
-    private readonly customerService: CustomerManagementService,
-  ) { }
+  constructor(private readonly customerService: CustomerManagementService) {}
 
   @Post()
   @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
@@ -58,7 +56,9 @@ export class CustomerManagementController {
 
   @Get()
   @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
-  @ApiOperation({ summary: 'Listar clientes da empresa atual (com busca opcional)' })
+  @ApiOperation({
+    summary: 'Listar clientes da empresa atual (com busca opcional)',
+  })
   @ApiQuery({
     name: 'search',
     required: false,
@@ -68,7 +68,10 @@ export class CustomerManagementController {
     type: [CustomerResponseDto],
     description: 'Lista de clientes do tenant atual',
   })
-  async findAll(@CurrentTenant() tenantId: string, @Query('search') search?: string): Promise<CustomerResponseDto[]> {
+  async findAll(
+    @CurrentTenant() tenantId: string,
+    @Query('search') search?: string,
+  ): Promise<CustomerResponseDto[]> {
     return this.customerService.findAll(tenantId, search);
   }
 
@@ -79,7 +82,10 @@ export class CustomerManagementController {
     type: CustomerResponseDto,
     description: 'Dados detalhados do cliente',
   })
-  async findById(@CurrentTenant() tenantId: string, @Param('id') id: string): Promise<CustomerResponseDto> {
+  async findById(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+  ): Promise<CustomerResponseDto> {
     return this.customerService.findById(tenantId, id);
   }
 

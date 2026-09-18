@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BullModule } from '@nestjs/bullmq';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './modules/database/database.module';
@@ -10,6 +11,7 @@ import { CustomerManagementModule } from './modules/customer-management/customer
 import { CarrierManagementModule } from './modules/carrier-management/carrier.module';
 import { FreightModule } from './modules/freight/freight.module';
 import { AuditModule } from './modules/audit/audit.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 import { authConfig } from './config/auth.config';
 
@@ -20,9 +22,19 @@ import { authConfig } from './config/auth.config';
       load: [authConfig],
       envFilePath: ['.env'],
     }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get<string>('REDIS_HOST', 'localhost'),
+          port: configService.get<number>('REDIS_PORT', 6379),
+        },
+      }),
+    }),
     DatabaseModule,
     CommonModule,
     AuditModule,
+    NotificationModule,
     TenantModule,
     UserModule,
     CustomerManagementModule,
@@ -32,4 +44,4 @@ import { authConfig } from './config/auth.config';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

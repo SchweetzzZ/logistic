@@ -102,7 +102,9 @@ export class AuditService {
     const [log] = await this.db
       .select()
       .from(auditLogsSchema)
-      .where(and(eq(auditLogsSchema.tenantId, tenantId), eq(auditLogsSchema.id, id)))
+      .where(
+        and(eq(auditLogsSchema.tenantId, tenantId), eq(auditLogsSchema.id, id)),
+      )
       .limit(1);
 
     if (!log) {

@@ -18,7 +18,8 @@ export class AuditController {
   @Get()
   @Roles(Role.ADMIN, Role.MANAGER)
   @ApiOperation({
-    summary: 'Listar registros de auditoria do sistema com filtros e paginação (ADMIN e MANAGER)',
+    summary:
+      'Listar registros de auditoria do sistema com filtros e paginação (ADMIN e MANAGER)',
   })
   async findAll(
     @CurrentTenant() tenantId: string,
@@ -30,12 +31,10 @@ export class AuditController {
   @Get(':id')
   @Roles(Role.ADMIN, Role.MANAGER)
   @ApiOperation({
-    summary: 'Buscar detalhes de um registro de auditoria por ID (ADMIN e MANAGER)',
+    summary:
+      'Buscar detalhes de um registro de auditoria por ID (ADMIN e MANAGER)',
   })
-  async findById(
-    @CurrentTenant() tenantId: string,
-    @Param('id') id: string,
-  ) {
+  async findById(@CurrentTenant() tenantId: string, @Param('id') id: string) {
     return this.auditService.findById(tenantId, id);
   }
 }

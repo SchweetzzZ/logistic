@@ -12,16 +12,17 @@ export const simulateFreightSchema = z.object({
     .string()
     .trim()
     .transform((val) => val.replace(/\D/g, ''))
-    .refine((val) => val.length === 8, 'O CEP de destino deve conter 8 dígitos'),
+    .refine(
+      (val) => val.length === 8,
+      'O CEP de destino deve conter 8 dígitos',
+    ),
   originZipCode: z
     .string()
     .trim()
     .transform((val) => val.replace(/\D/g, ''))
     .refine((val) => val.length === 8, 'O CEP de origem deve conter 8 dígitos')
     .optional(),
-  weight: z
-    .number()
-    .positive('O peso real deve ser maior que zero (em kg)'),
+  weight: z.number().positive('O peso real deve ser maior que zero (em kg)'),
   dimensions: packageDimensionsSchema,
   declaredValue: z
     .number()
