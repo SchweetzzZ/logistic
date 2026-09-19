@@ -22,3 +22,47 @@ export const auditFilterSchema = z.object({
 });
 
 export class AuditFilterDto extends createZodDto(auditFilterSchema) {}
+
+export const auditLogItemSchema = z.object({
+  id: z.string(),
+  tenantId: z.string().nullable().optional(),
+  userId: z.string().nullable().optional(),
+  userName: z.string().nullable().optional(),
+  userEmail: z.string().nullable().optional(),
+  action: z.enum(AUDIT_ACTIONS),
+  resource: z.string(),
+  resourceId: z.string().nullable().optional(),
+  ipAddress: z.string().nullable().optional(),
+  userAgent: z.string().nullable().optional(),
+  details: z.record(z.string(), z.any()).nullable().optional(),
+  createdAt: z.string(),
+});
+
+export const auditLogPaginatedResponseSchema = z.object({
+  data: z.array(auditLogItemSchema),
+  total: z.number(),
+  page: z.number(),
+  limit: z.number(),
+  totalPages: z.number(),
+});
+
+export class AuditLogPaginatedResponseDto extends createZodDto(
+  auditLogPaginatedResponseSchema,
+) {}
+
+export const auditLogDetailResponseSchema = z.object({
+  id: z.string(),
+  tenantId: z.string().nullable().optional(),
+  userId: z.string().nullable().optional(),
+  action: z.enum(AUDIT_ACTIONS),
+  resource: z.string(),
+  resourceId: z.string().nullable().optional(),
+  ipAddress: z.string().nullable().optional(),
+  userAgent: z.string().nullable().optional(),
+  details: z.record(z.string(), z.any()).nullable().optional(),
+  createdAt: z.string(),
+});
+
+export class AuditLogDetailResponseDto extends createZodDto(
+  auditLogDetailResponseSchema,
+) {}

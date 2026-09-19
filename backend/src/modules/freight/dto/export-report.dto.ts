@@ -11,3 +11,13 @@ export const exportFreightReportSchema = z.object({
 export class ExportFreightReportDto extends createZodDto(
   exportFreightReportSchema,
 ) {}
+
+export const exportReportResponseSchema = z.object({
+  jobId: z.string().optional(),
+  status: z.string(),
+  message: z.string(),
+});
+
+export class ExportReportResponseDto extends createZodDto(
+  exportReportResponseSchema,
+) {}

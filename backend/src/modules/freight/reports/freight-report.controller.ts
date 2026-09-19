@@ -1,7 +1,5 @@
-import {
-  Controller, Post, Get, Body, Param, Res, HttpCode, HttpStatus, UseGuards, NotFoundException,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { Controller, Post, Get, Body, Param, Res, HttpCode, HttpStatus, UseGuards, NotFoundException, } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiAcceptedResponse, ApiOkResponse, ApiProduces, } from '@nestjs/swagger';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import type { Response } from 'express';
@@ -12,7 +10,10 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { ExportFreightReportDto } from '../dto/export-report.dto';
+import {
+  ExportFreightReportDto,
+  ExportReportResponseDto,
+} from '../dto/export-report.dto';
 import { REPORTS_STORAGE_DIR } from './reports.constants';
 
 @ApiTags('Freight Reports')
@@ -33,11 +34,11 @@ export class FreightReportController {
     description:
       'Enfileira a exportação em background via BullMQ. O frontend será avisado via SSE assim que o arquivo estiver disponível.',
   })
-  async exportReport(
-    @CurrentTenant() tenantId: string,
-    @CurrentUser('userId') userId: string,
-    @Body() dto: ExportFreightReportDto,
-  ) {
+  @ApiAcceptedResponse({
+    type: ExportReportResponseDto,
+    description: 'A geração do relatório foi enfileirada com sucesso',
+  })
+  async exportReport(@CurrentTenant() tenantId: string, @CurrentUser('userId') userId: string, @Body() dto: ExportFreightReportDto,): Promise<ExportReportResponseDto> {
     const job = await this.reportsQueue.add(
       'generate-report',
       {
@@ -68,6 +69,14 @@ export class FreightReportController {
   @ApiParam({
     name: 'fileName',
     description: 'Nome do arquivo retornado na notificação',
+  })
+  @ApiProduces('text/csv')
+  @ApiOkResponse({
+    description: 'Arquivo CSV para download',
+    schema: {
+      type: 'string',
+      format: 'binary',
+    },
   })
   downloadFile(@Param('fileName') fileName: string, @Res() res: Response) {
     // Sanitiza o nome do arquivo prevenindo path traversal
