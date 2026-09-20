@@ -69,29 +69,29 @@ export function Navbar() {
 
         {/* LADO DIREITO */}
         <div className="hidden md:flex items-center gap-4">
-          <a
+          <Link
             href="/login"
             className="text-sm text-zinc-600 hover:text-zinc-900 px-3 py-2 transition duration-150 cursor-pointer"
           >
             Acessar sistema
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/register"
             className="inline-flex items-center justify-center text-sm font-medium bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-lg transition-all duration-150 shadow-sm cursor-pointer"
           >
             Cadastrar empresa
-          </a>
+          </Link>
         </div>
 
         {/* MOBILE MENU TRIGGER */}
         <div className="flex items-center md:hidden gap-2">
-          <a
+          <Link
             href="/login"
             className="text-xs text-zinc-700 hover:text-zinc-900 px-2.5 py-1.5 rounded-lg border border-zinc-200"
           >
             Entrar
-          </a>
+          </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-zinc-600 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 border border-zinc-200"
@@ -130,20 +130,20 @@ export function Navbar() {
           </div>
 
           <div className="pt-3 border-t border-zinc-200 flex flex-col gap-2.5">
-            <a
+            <Link
               href="/login"
               onClick={() => setMobileMenuOpen(false)}
               className="w-full text-center py-2 text-sm text-zinc-700 border border-zinc-200 rounded-lg hover:bg-zinc-50"
             >
               Acessar sistema
-            </a>
-            <a
+            </Link>
+            <Link
               href="/register"
               onClick={() => setMobileMenuOpen(false)}
               className="w-full text-center py-2 text-sm font-medium bg-zinc-900 text-white rounded-lg hover:bg-zinc-800"
             >
               Cadastrar empresa
-            </a>
+            </Link>
           </div>
         </div>
       )}
