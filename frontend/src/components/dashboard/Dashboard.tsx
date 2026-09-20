@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   ArrowDownRight,
   ArrowRight,
@@ -16,6 +17,7 @@ import {
   FileText,
   History,
   LayoutDashboard,
+  LogOut,
   Menu,
   MoreHorizontal,
   Search,
@@ -25,7 +27,8 @@ import {
   UsersRound,
   X,
 } from 'lucide-react';
-import { api } from '@/src/services/api';
+import { authService } from '@/src/services/auth';
+import { dashboardService } from '@/src/services/dashboard';
 import { DashboardData, Quote, CarrierShare, UserProfile, CompanyInfo } from '@/src/types';
 
 const menuItems = [
@@ -52,11 +55,15 @@ function BrandMark() {
 function SidebarContent({
   company,
   user,
+  pathname,
   onClose,
+  onLogout,
 }: {
   company: CompanyInfo | null;
   user: UserProfile | null;
+  pathname?: string;
   onClose?: () => void;
+  onLogout?: () => void;
 }) {
   const companyName = company?.name || 'Sua Empresa';
   const environment = company?.environment || 'Ambiente LogiFlow';
@@ -94,20 +101,22 @@ function SidebarContent({
 
         <nav className="mt-8 space-y-1" aria-label="Navegação principal">
           {menuItems.map(({ label, icon: Icon, href }) => {
-            const active = href === '/dashboard';
+            const currentPath = pathname || '/dashboard';
+            const active =
+              currentPath === href ||
+              (href !== '/dashboard' && currentPath.startsWith(href));
             return (
               <Link
                 key={label}
                 href={href}
                 onClick={onClose}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  active
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${active
                     ? 'bg-amber-50 font-semibold text-zinc-950 ring-1 ring-amber-200/80 shadow-xs'
                     : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950'
-                }`}
+                  }`}
               >
                 <Icon
-                  className={`size-[18px] shrink-0 ${active ? 'text-amber-700' : 'text-zinc-500'}`}
+                  className={`size-4.5 shrink-0 ${active ? 'text-amber-700' : 'text-zinc-500'}`}
                   aria-hidden="true"
                 />
                 <span className="truncate">{label}</span>
@@ -122,7 +131,7 @@ function SidebarContent({
             onClick={onClose}
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-950"
           >
-            <Settings className="size-[18px] shrink-0 text-zinc-500" aria-hidden="true" />
+            <Settings className="size-4.5 shrink-0 text-zinc-500" aria-hidden="true" />
             <span className="truncate">Empresa e configurações</span>
           </Link>
           <a
@@ -130,14 +139,14 @@ function SidebarContent({
             onClick={onClose}
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-950"
           >
-            <CircleHelp className="size-[18px] shrink-0 text-zinc-500" aria-hidden="true" />
+            <CircleHelp className="size-4.5 shrink-0 text-zinc-500" aria-hidden="true" />
             <span className="truncate">Central de ajuda</span>
           </a>
         </div>
       </div>
 
-      <div className="border-t border-zinc-100 pt-4">
-        <button className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-zinc-50">
+      <div className="border-t border-zinc-100 pt-4 flex items-center justify-between">
+        <div className="flex min-w-0 items-center gap-3">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-900">
             {userInitials}
           </span>
@@ -149,17 +158,33 @@ function SidebarContent({
               {userRole}
             </span>
           </span>
-          <ChevronDown className="size-4 shrink-0 text-zinc-400" aria-hidden="true" />
-        </button>
+        </div>
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            title="Encerrar sessão"
+            className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-100 hover:text-red-600 transition cursor-pointer"
+            aria-label="Encerrar sessão"
+          >
+            <LogOut className="size-4" />
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
 export function Dashboard() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = async () => {
+    await authService.logout();
+    router.push('/login');
+  };
 
   // Fecha o menu com tecla ESC e trava o scroll quando o drawer mobile estiver aberto
   useEffect(() => {
@@ -187,7 +212,7 @@ export function Dashboard() {
     async function loadData() {
       try {
         setLoading(true);
-        const data = await api.getDashboardData();
+        const data = await dashboardService.getData();
         if (isMounted) {
           setDashboardData(data);
         }
@@ -278,7 +303,7 @@ export function Dashboard() {
     <div className="flex min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased selection:bg-amber-200 selection:text-zinc-950">
       {/* Sidebar Desktop */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-zinc-200/90 bg-white px-4 py-5 lg:flex lg:flex-col">
-        <SidebarContent company={company} user={user} />
+        <SidebarContent company={company} user={user} pathname={pathname} onLogout={handleLogout} />
       </aside>
 
       {/* Drawer Mobile / Tablet */}
@@ -289,8 +314,8 @@ export function Dashboard() {
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
-          <aside className="relative z-10 flex h-full w-[280px] max-w-[85vw] flex-col border-r border-zinc-200 bg-white px-4 py-5 shadow-2xl animate-in slide-in-from-left duration-200">
-            <SidebarContent company={company} user={user} onClose={() => setMobileMenuOpen(false)} />
+          <aside className="relative z-10 flex h-full w-70 max-w-[85vw] flex-col border-r border-zinc-200 bg-white px-4 py-5 shadow-2xl animate-in slide-in-from-left duration-200">
+            <SidebarContent company={company} user={user} pathname={pathname} onClose={() => setMobileMenuOpen(false)} onLogout={handleLogout} />
           </aside>
         </div>
       )}
@@ -327,11 +352,15 @@ export function Dashboard() {
               <Bell className="size-5" />
             </button>
             <span className="hidden h-6 w-px bg-zinc-200 sm:block" />
-            <button className="hidden items-center gap-2 rounded-lg py-1 pl-1 pr-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 sm:flex">
+            <button
+              onClick={handleLogout}
+              title="Encerrar sessão"
+              className="hidden items-center gap-2 rounded-lg py-1 pl-1 pr-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 sm:flex cursor-pointer"
+            >
               <span className="flex size-7 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-900">
                 {user?.initials || 'U'}
               </span>
-              <ChevronDown className="size-4 text-zinc-400" />
+              <LogOut className="size-3.5 text-zinc-400 hover:text-red-600 transition" />
             </button>
           </div>
         </header>
@@ -385,13 +414,12 @@ export function Dashboard() {
                     {loading ? '-' : value}
                   </p>
                   <p
-                    className={`mt-2 flex items-center gap-1 text-xs font-medium ${
-                      positive === null
+                    className={`mt-2 flex items-center gap-1 text-xs font-medium ${positive === null
                         ? 'text-zinc-500'
                         : positive
-                        ? 'text-emerald-700'
-                        : 'text-zinc-500'
-                    }`}
+                          ? 'text-emerald-700'
+                          : 'text-zinc-500'
+                      }`}
                   >
                     {positive !== null &&
                       (positive ? (
@@ -503,7 +531,7 @@ export function Dashboard() {
 
                 <div className="overflow-x-auto border-t border-zinc-100">
                   {recentQuotes.length > 0 ? (
-                    <table className="w-full min-w-[620px] text-left text-sm">
+                    <table className="w-full min-w-155 text-left text-sm">
                       <thead className="bg-zinc-50/80 text-xs font-medium text-zinc-500">
                         <tr>
                           <th className="px-5 py-3">Rota</th>
