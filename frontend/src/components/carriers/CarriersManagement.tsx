@@ -208,13 +208,7 @@ export function CarriersManagement() {
         </div>
 
         <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500">Ativas para Cotação</span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Operando
-            </span>
-          </div>
+          <span className="text-xs font-medium text-zinc-500">Ativas para Cotação</span>
           <p className="mt-1 text-2xl font-bold text-emerald-600">{activeCount}</p>
         </div>
 

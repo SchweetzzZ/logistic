@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, Clock, DollarSign, Loader2, ShieldCheck, Truck, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, DollarSign, Loader2, ShieldCheck, Truck, X } from 'lucide-react';
 import { Carrier, CreateCarrierInput, UpdateCarrierInput } from '@/src/types';
+import { cnpjService } from '@/src/services';
 
 interface CarrierModalProps {
   isOpen: boolean;
@@ -48,6 +49,10 @@ export function CarrierModal({
   const [status, setStatus] = useState<'ACTIVE' | 'INACTIVE'>('ACTIVE');
   const [localError, setLocalError] = useState<string | null>(null);
 
+  const [cnpjLoading, setCnpjLoading] = useState(false);
+  const [cnpjBadge, setCnpjBadge] = useState<string | null>(null);
+  const [lastCheckedCnpj, setLastCheckedCnpj] = useState<string>('');
+
   useEffect(() => {
     if (carrier) {
       setName(carrier.name || '');
@@ -69,7 +74,54 @@ export function CarrierModal({
       setStatus('ACTIVE');
     }
     setLocalError(null);
+    setCnpjBadge(null);
+    setCnpjLoading(false);
+    setLastCheckedCnpj('');
   }, [carrier, isOpen]);
+
+  // Consulta automática do CNPJ quando 14 dígitos são informados
+  const handleDocumentChange = async (val: string) => {
+    const formatted = formatCNPJorCPF(val);
+    setDocument(formatted);
+
+    const cleanCnpj = formatted.replace(/\D/g, '');
+    if (cleanCnpj.length === 14 && cleanCnpj !== lastCheckedCnpj) {
+      setLastCheckedCnpj(cleanCnpj);
+      setCnpjLoading(true);
+      setCnpjBadge(null);
+
+      try {
+        const info = await cnpjService.lookup(cleanCnpj);
+        if (info) {
+          // Preenche apenas campos que estejam em branco
+          const suggestedName = info.nomeFantasia || info.razaoSocial;
+          if (!name.trim() && suggestedName) {
+            setName(suggestedName);
+          }
+          if (!email.trim() && info.email) {
+            setEmail(info.email);
+          }
+          if (!phone.trim() && info.phone) {
+            setPhone(info.phone);
+          }
+
+          const cityUf = [info.municipio, info.uf].filter(Boolean).join('/');
+          const sit = info.situacaoCadastral || 'Ativo';
+          setCnpjBadge(
+            `✓ CNPJ ${sit} na Receita Federal${cityUf ? ` (${cityUf})` : ''}`,
+          );
+        } else {
+          setCnpjBadge(null);
+        }
+      } catch {
+        setCnpjBadge(null);
+      } finally {
+        setCnpjLoading(false);
+      }
+    } else if (cleanCnpj.length < 14) {
+      setCnpjBadge(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,11 +221,23 @@ export function CarrierModal({
                 type="text"
                 required
                 value={document}
-                onChange={(e) => setDocument(formatCNPJorCPF(e.target.value))}
+                onChange={(e) => handleDocumentChange(e.target.value)}
                 placeholder="00.000.000/0000-00"
                 maxLength={18}
                 className="w-full rounded-xl border bg-zinc-50/50 px-3.5 py-2.5 text-sm font-mono text-zinc-900 transition focus:border-amber-500 focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
               />
+              {cnpjLoading && (
+                <div className="mt-1.5 flex items-center gap-1.5 text-xs text-amber-600">
+                  <Loader2 className="size-3.5 animate-spin" />
+                  <span>Consultando Receita Federal...</span>
+                </div>
+              )}
+              {!cnpjLoading && cnpjBadge && (
+                <div className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                  <CheckCircle2 className="size-3.5 shrink-0 text-emerald-600" />
+                  <span>{cnpjBadge}</span>
+                </div>
+              )}
             </div>
 
             <div>
