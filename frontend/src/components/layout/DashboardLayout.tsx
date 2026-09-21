@@ -20,6 +20,9 @@ import {
 } from 'lucide-react';
 import { authService } from '@/src/services/auth';
 import { CompanyInfo, UserProfile } from '@/src/types';
+import { NotificationProvider } from '@/src/context/NotificationContext';
+import { NotificationBell } from '@/src/components/notifications/NotificationBell';
+import { RealtimeToastContainer } from '@/src/components/notifications/RealtimeToastContainer';
 
 const menuItems = [
   { label: 'Visão geral', icon: LayoutDashboard, href: '/dashboard' },
@@ -229,63 +232,85 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }, [mobileMenuOpen]);
 
   return (
-    <div className="flex min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased selection:bg-amber-200 selection:text-zinc-950">
-      {/* Sidebar Desktop */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-zinc-200/90 bg-white px-4 py-5 lg:flex lg:flex-col">
-        <SidebarContent
-          company={company}
-          user={user}
-          pathname={pathname}
-          onLogout={handleLogout}
-        />
-      </aside>
-
-      {/* Sidebar Mobile (Gaveta deslizante) */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex lg:hidden">
-          <div
-            className="fixed inset-0 bg-zinc-900/60 backdrop-blur-xs transition-opacity duration-300"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-hidden="true"
+    <NotificationProvider>
+      <div className="flex min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased selection:bg-amber-200 selection:text-zinc-950">
+        {/* Sidebar Desktop */}
+        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-zinc-200/90 bg-white px-4 py-5 lg:flex lg:flex-col">
+          <SidebarContent
+            company={company}
+            user={user}
+            pathname={pathname}
+            onLogout={handleLogout}
           />
-          <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white p-5 shadow-2xl transition-transform duration-300">
-            <SidebarContent
-              company={company}
-              user={user}
-              pathname={pathname}
-              onClose={() => setMobileMenuOpen(false)}
-              onLogout={handleLogout}
+        </aside>
+
+        {/* Sidebar Mobile (Gaveta deslizante) */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 flex lg:hidden">
+            <div
+              className="fixed inset-0 bg-zinc-900/60 backdrop-blur-xs transition-opacity duration-300"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-hidden="true"
             />
+            <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white p-5 shadow-2xl transition-transform duration-300">
+              <SidebarContent
+                company={company}
+                user={user}
+                pathname={pathname}
+                onClose={() => setMobileMenuOpen(false)}
+                onLogout={handleLogout}
+              />
+            </div>
           </div>
+        )}
+
+        {/* Conteúdo da Área Principal */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          {/* Topbar Desktop */}
+          <header className="hidden lg:flex sticky top-0 z-30 h-16 items-center justify-between border-b border-zinc-200/90 bg-white/95 px-8 backdrop-blur-sm">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md ring-1 ring-amber-500/20">
+                LogiFlow Cloud
+              </span>
+              <span className="text-xs text-zinc-300">/</span>
+              <span className="text-xs font-medium text-zinc-600">
+                {company?.name || 'Sua Empresa'}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <NotificationBell />
+            </div>
+          </header>
+
+          {/* Topbar Mobile */}
+          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-zinc-200/90 bg-white/95 px-4 backdrop-blur-sm lg:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="rounded-lg p-2 text-zinc-600 hover:bg-zinc-100 cursor-pointer"
+              aria-label="Abrir menu de navegação"
+            >
+              <Menu className="size-5" />
+            </button>
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <BrandMark />
+              <span className="text-sm font-semibold text-zinc-950">
+                {company?.name || 'LogiFlow'}
+              </span>
+            </Link>
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-900">
+                {user?.initials || 'U'}
+              </span>
+            </div>
+          </header>
+
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+            <div className="mx-auto max-w-7xl">{children}</div>
+          </main>
         </div>
-      )}
-
-      {/* Conteúdo da Área Principal */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Topbar Mobile */}
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-zinc-200/90 bg-white/95 px-4 backdrop-blur-sm lg:hidden">
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="rounded-lg p-2 text-zinc-600 hover:bg-zinc-100 cursor-pointer"
-            aria-label="Abrir menu de navegação"
-          >
-            <Menu className="size-5" />
-          </button>
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <BrandMark />
-            <span className="text-sm font-semibold text-zinc-950">
-              {company?.name || 'LogiFlow'}
-            </span>
-          </Link>
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-900">
-            {user?.initials || 'U'}
-          </span>
-        </header>
-
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <div className="mx-auto max-w-7xl">{children}</div>
-        </main>
       </div>
-    </div>
+      <RealtimeToastContainer />
+    </NotificationProvider>
   );
 }

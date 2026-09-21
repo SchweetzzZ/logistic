@@ -79,9 +79,7 @@ export class FreightReportProcessor extends WorkerHost {
     return { filePath, totalRecords: records.length };
   }
 
-  /**
-   * Converte a lista de auditorias em uma string CSV formatada
-   */
+  // Converte a lista de auditorias em uma string CSV formatada
   private generateCsv(records: AuditFreight[]): string {
     const headers = [
       'ID',
