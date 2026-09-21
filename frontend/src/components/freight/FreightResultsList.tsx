@@ -7,11 +7,9 @@ import {
   ArrowRight,
   Package,
   History,
-  AlertCircle,
   Truck,
   RotateCcw,
   Sparkles,
-  Info,
 } from 'lucide-react';
 import { SimulationResult } from '@/src/types';
 import { FreightQuoteCard } from './FreightQuoteCard';
@@ -34,34 +32,7 @@ function formatBRL(value: number): string {
 }
 
 export function FreightResultsList({ result, onReset }: FreightResultsListProps) {
-  const { origin, destination, deliveryType, quotes, package: pkg } = result;
-
-  const getDeliveryTypeBadge = () => {
-    switch (deliveryType) {
-      case 'LOCAL':
-        return (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 border border-emerald-200">
-            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-            Entrega Local (Mesma Cidade)
-          </span>
-        );
-      case 'STATE':
-        return (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 border border-amber-200">
-            <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
-            Entrega Estadual (Mesmo Estado)
-          </span>
-        );
-      case 'INTERSTATE':
-      default:
-        return (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-800 border border-indigo-200">
-            <span className="size-2 rounded-full bg-indigo-500 animate-pulse" />
-            Entrega Interestadual
-          </span>
-        );
-    }
-  };
+  const { origin, destination, quotes, package: pkg } = result;
 
   return (
     <div className="space-y-6">
@@ -77,20 +48,17 @@ export function FreightResultsList({ result, onReset }: FreightResultsListProps)
             </h2>
           </div>
 
-          <div className="flex items-center gap-2">
-            {getDeliveryTypeBadge()}
-            {onReset && (
-              <button
-                type="button"
-                onClick={onReset}
-                className="inline-flex items-center gap-1 rounded-xl border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 transition cursor-pointer"
-                title="Limpar e realizar nova simulação"
-              >
-                <RotateCcw className="size-3.5" />
-                <span>Nova</span>
-              </button>
-            )}
-          </div>
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="inline-flex items-center gap-1 rounded-xl border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 transition cursor-pointer"
+              title="Limpar e realizar nova simulação"
+            >
+              <RotateCcw className="size-3.5" />
+              <span>Nova</span>
+            </button>
+          )}
         </div>
 
         {/* Route Details */}

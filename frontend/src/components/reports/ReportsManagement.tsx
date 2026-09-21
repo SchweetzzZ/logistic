@@ -5,15 +5,12 @@ import {
   AlertCircle,
   Calendar,
   CheckCircle2,
-  Clock,
   Download,
   FileSpreadsheet,
   HelpCircle,
   Loader2,
-  Radio,
   Send,
   Trash2,
-  Zap,
 } from 'lucide-react';
 import { reportsService } from '@/src/services/reports';
 import { useNotificationContext } from '@/src/context/NotificationContext';
@@ -226,64 +223,7 @@ export function ReportsManagement() {
         </div>
       </div>
 
-      {/* 2. Cards de Valor para o Usuário */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {/* Card 1: Segundo Plano */}
-        <div className="rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-xs transition hover:border-amber-300">
-          <div className="flex items-center justify-between">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
-              <Clock className="size-5" />
-            </span>
-            <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-500/20">
-              Segundo Plano
-            </span>
-          </div>
-          <h3 className="mt-4 text-base font-semibold text-zinc-950">
-            Processamento em Segundo Plano
-          </h3>
-          <p className="mt-1 text-xs text-zinc-500 leading-relaxed">
-            Gere grandes volumes de dados sem travar sua navegação na plataforma.
-          </p>
-        </div>
-
-        {/* Card 2: Compatibilidade */}
-        <div className="rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-xs transition hover:border-amber-300">
-          <div className="flex items-center justify-between">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800">
-              <FileSpreadsheet className="size-5" />
-            </span>
-            <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-500/20">
-              CSV / Excel
-            </span>
-          </div>
-          <h3 className="mt-4 text-base font-semibold text-zinc-950">
-            Compatível com Excel & Planilhas
-          </h3>
-          <p className="mt-1 text-xs text-zinc-500 leading-relaxed">
-            Arquivos em formato CSV com codificação UTF-8 e delimitador compatível com Excel e Google Sheets.
-          </p>
-        </div>
-
-        {/* Card 3: Notificação */}
-        <div className="rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-xs transition hover:border-amber-300">
-          <div className="flex items-center justify-between">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-blue-100 text-blue-800">
-              <CheckCircle2 className="size-5" />
-            </span>
-            <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-500/20">
-              Notificação
-            </span>
-          </div>
-          <h3 className="mt-4 text-base font-semibold text-zinc-950">
-            Aviso Instantâneo
-          </h3>
-          <p className="mt-1 text-xs text-zinc-500 leading-relaxed">
-            Você é notificado no sistema assim que o arquivo estiver disponível para download.
-          </p>
-        </div>
-      </div>
-
-      {/* 3. Formulário de Exportação */}
+      {/* Formulário de Exportação */}
       <div className="rounded-2xl border border-zinc-200/90 bg-white p-6 shadow-xs">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-100 pb-4">
           <div>
@@ -511,20 +451,20 @@ export function ReportsManagement() {
                       {/* Status */}
                       <td className="px-4 py-3.5">
                         {isProcessing && (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-400/30">
-                            <Loader2 className="size-3 animate-spin text-amber-600" />
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-700">
+                            <Loader2 className="size-3 animate-spin text-amber-500" />
                             Gerando arquivo...
                           </span>
                         )}
                         {isCompleted && (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-500/30">
-                            <CheckCircle2 className="size-3 text-emerald-600" />
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-700">
+                            <span className="size-2 rounded-full bg-emerald-500" />
                             Pronto para download
                           </span>
                         )}
                         {job.status === 'FAILED' && (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-800 ring-1 ring-red-400/30">
-                            <AlertCircle className="size-3 text-red-600" />
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-700">
+                            <span className="size-2 rounded-full bg-red-500" />
                             Falha no processamento
                           </span>
                         )}
