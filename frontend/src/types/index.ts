@@ -5,3 +5,5 @@ export * from './carriers';
 export * from './freight';
 export * from './tenant';
 export * from './users';
+export * from './audit';
+export * from './reports';

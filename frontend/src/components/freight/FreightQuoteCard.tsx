@@ -7,18 +7,11 @@ import {
   ChevronDown,
   Copy,
   Check,
-  Zap,
-  TrendingDown,
-  ShieldCheck,
-  Scale,
-  MapPin,
 } from 'lucide-react';
 import { FreightQuote } from '@/src/types';
 
 export interface FreightQuoteCardProps {
   quote: FreightQuote;
-  isCheapest?: boolean;
-  isFastest?: boolean;
   routeInfo?: {
     originCity?: string;
     originState?: string;
@@ -36,8 +29,6 @@ function formatBRL(value: number): string {
 
 export function FreightQuoteCard({
   quote,
-  isCheapest = false,
-  isFastest = false,
   routeInfo,
 }: FreightQuoteCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -89,42 +80,14 @@ Composição dos Custos:
   };
 
   return (
-    <div
-      className={`relative rounded-2xl border bg-white p-5 shadow-xs transition-all hover:shadow-md ${
-        isCheapest && isFastest
-          ? 'border-emerald-400 ring-2 ring-emerald-300/40'
-          : isCheapest
-          ? 'border-emerald-300 ring-1 ring-emerald-200/50'
-          : isFastest
-          ? 'border-sky-300 ring-1 ring-sky-200/50'
-          : 'border-zinc-200/80 hover:border-zinc-300'
-      }`}
-    >
-      {/* Top Badges */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-100">
-        <div className="flex items-center gap-2">
+    <div className="relative rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-xs transition-all hover:border-zinc-300 hover:shadow-md">
+      {/* Top Header */}
+      <div className="flex items-center justify-between gap-2 pb-3 border-b border-zinc-100">
+        <div className="flex items-center gap-2.5">
           <div className="flex size-8 items-center justify-center rounded-xl bg-zinc-100 text-zinc-800">
             <Truck className="size-4" />
           </div>
-          <div>
-            <h3 className="text-base font-bold text-zinc-950">{quote.carrierName}</h3>
-            <span className="text-xs text-zinc-500">Transportadora Credenciada</span>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-1.5">
-          {isCheapest && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/80">
-              <TrendingDown className="size-3.5 text-emerald-600" />
-              Mais Econômico
-            </span>
-          )}
-          {isFastest && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700 border border-sky-200/80">
-              <Zap className="size-3.5 text-sky-600" />
-              Mais Rápido
-            </span>
-          )}
+          <h3 className="text-base font-bold text-zinc-950">{quote.carrierName}</h3>
         </div>
       </div>
 

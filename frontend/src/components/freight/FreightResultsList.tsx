@@ -36,9 +36,6 @@ function formatBRL(value: number): string {
 export function FreightResultsList({ result, onReset }: FreightResultsListProps) {
   const { origin, destination, deliveryType, quotes, package: pkg } = result;
 
-  const minPrice = quotes.length > 0 ? Math.min(...quotes.map((q) => q.totalPrice)) : 0;
-  const minDeadline = quotes.length > 0 ? Math.min(...quotes.map((q) => q.deadlineDays)) : 0;
-
   const getDeliveryTypeBadge = () => {
     switch (deliveryType) {
       case 'LOCAL':
@@ -188,10 +185,14 @@ export function FreightResultsList({ result, onReset }: FreightResultsListProps)
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-base font-bold text-zinc-950">
-            {quotes.length} {quotes.length === 1 ? 'Opção Disponível' : 'Opções Disponíveis'}
+            {quotes.length === 1
+              ? 'Resultado da Cotação'
+              : `${quotes.length} Opções Disponíveis`}
           </h3>
           <p className="text-xs text-zinc-500">
-            Transportadoras ativas ordenadas pela melhor condição comercial
+            {quotes.length === 1
+              ? 'Condição calculada para a transportadora selecionada'
+              : 'Transportadoras ativas ordenadas pela melhor condição comercial'}
           </p>
         </div>
       </div>
@@ -224,8 +225,6 @@ export function FreightResultsList({ result, onReset }: FreightResultsListProps)
             <FreightQuoteCard
               key={quote.carrierId}
               quote={quote}
-              isCheapest={quote.totalPrice === minPrice}
-              isFastest={quote.deadlineDays === minDeadline}
               routeInfo={{
                 originCity: origin.city,
                 originState: origin.state,

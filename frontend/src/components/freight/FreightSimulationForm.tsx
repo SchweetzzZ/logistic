@@ -14,9 +14,11 @@ import {
   Loader2,
   Sparkles,
   ArrowRight,
+  Truck,
+  ChevronDown,
 } from 'lucide-react';
-import { Customer, SimulateFreightInput } from '@/src/types';
-import { customersService } from '@/src/services';
+import { Carrier, Customer, SimulateFreightInput } from '@/src/types';
+import { carriersService, customersService } from '@/src/services';
 import { CubagePreviewWidget } from './CubagePreviewWidget';
 
 export interface FreightSimulationFormProps {
@@ -93,6 +95,11 @@ export function FreightSimulationForm({
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
   const [loadingCustomers, setLoadingCustomers] = useState(false);
 
+  // Transportadoras para seleção rápida / filtro
+  const [carriers, setCarriers] = useState<Carrier[]>([]);
+  const [selectedCarrierId, setSelectedCarrierId] = useState<string>('');
+  const [loadingCarriers, setLoadingCarriers] = useState(false);
+
   // Erros de Validação
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [activePreset, setActivePreset] = useState<string | null>(null);
@@ -122,6 +129,30 @@ export function FreightSimulationForm({
     };
   }, []);
 
+  // Carrega transportadoras ativas para o dropdown
+  useEffect(() => {
+    let isMounted = true;
+    async function loadCarriersList() {
+      try {
+        setLoadingCarriers(true);
+        const data = await carriersService.list();
+        if (isMounted) {
+          setCarriers(data.filter((c) => c.status === 'ACTIVE'));
+        }
+      } catch {
+        // Falha silenciosa
+      } finally {
+        if (isMounted) {
+          setLoadingCarriers(false);
+        }
+      }
+    }
+    loadCarriersList();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Lê parâmetros de URL (Repetir Simulação / Deep links)
   useEffect(() => {
     if (!searchParams) return;
@@ -144,6 +175,8 @@ export function FreightSimulationForm({
       searchParams.get('height') || searchParams.get('dimensionsHeight') || searchParams.get('h');
     const declaredValueParam =
       searchParams.get('declaredValue') || searchParams.get('value');
+    const carrierIdParam =
+      searchParams.get('carrierId') || searchParams.get('carrier');
 
     if (originParam) setOriginZipCode(formatCEP(originParam));
     if (destinationParam) setDestinationZipCode(formatCEP(destinationParam));
@@ -152,6 +185,7 @@ export function FreightSimulationForm({
     if (widthParam) setWidth(widthParam);
     if (heightParam) setHeight(heightParam);
     if (declaredValueParam) setDeclaredValue(declaredValueParam);
+    if (carrierIdParam) setSelectedCarrierId(carrierIdParam);
   }, [searchParams]);
 
   // Aplica predefinição de pacote
@@ -230,8 +264,15 @@ export function FreightSimulationForm({
         height: heightNum,
       },
       declaredValue: declaredValNum,
+      carrierId: selectedCarrierId || undefined,
     });
   };
+
+  // Transportadora selecionada para personalizar o botão de envio
+  const selectedCarrier = carriers.find((c) => c.id === selectedCarrierId);
+  const submitButtonText = selectedCarrier
+    ? `Calcular Frete com ${selectedCarrier.name}`
+    : 'Calcular e Comparar Fretes';
 
   // Valores numéricos para o widget de cubagem
   const numericLength = parseFloat(length.replace(',', '.')) || 0;
@@ -241,6 +282,53 @@ export function FreightSimulationForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Seção 0: Seleção de Transportadora */}
+      <div className="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-xs">
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
+          <div className="flex items-center gap-2">
+            <span className="flex size-7 items-center justify-center rounded-lg bg-zinc-100 text-zinc-800">
+              <Truck className="size-4 text-amber-500" />
+            </span>
+            <h3 className="text-sm font-bold text-zinc-950">Transportadora</h3>
+          </div>
+          <span className="text-[11px] text-zinc-400">Filtro Opcional</span>
+        </div>
+
+        <div>
+          <label
+            htmlFor="carrier-select"
+            className="block text-xs font-semibold text-zinc-700 mb-1.5"
+          >
+            Transportadora disponível
+          </label>
+          <div className="relative">
+            <Truck className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none" />
+            <select
+              id="carrier-select"
+              value={selectedCarrierId}
+              onChange={(e) => setSelectedCarrierId(e.target.value)}
+              disabled={loadingCarriers}
+              className="w-full rounded-xl border border-zinc-200 bg-zinc-50/60 py-2.5 pl-10 pr-9 text-xs font-medium text-zinc-800 transition focus:border-amber-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20 cursor-pointer appearance-none"
+            >
+              <option value="">
+                {loadingCarriers
+                  ? 'Carregando transportadoras...'
+                  : 'Todas as parceiras (Comparativo geral)'}
+              </option>
+              {carriers.map((carrier) => (
+                <option key={carrier.id} value={carrier.id}>
+                  {carrier.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none" />
+          </div>
+          <p className="mt-1.5 text-[11px] text-zinc-400">
+            Selecione uma parceira específica para cotação direta ou compare todas as opções cadastradas.
+          </p>
+        </div>
+      </div>
+
       {/* Seção 1: Rota e Destinatário */}
       <div className="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-xs">
         <div className="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
@@ -570,7 +658,7 @@ export function FreightSimulationForm({
         ) : (
           <>
             <Calculator className="size-4 text-amber-400" />
-            <span>Calcular e Comparar Fretes</span>
+            <span>{submitButtonText}</span>
           </>
         )}
       </button>

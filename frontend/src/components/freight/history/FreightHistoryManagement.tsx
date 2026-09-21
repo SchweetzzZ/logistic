@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   AlertCircle,
-  AlertTriangle,
-  ArrowRight,
   Calculator,
   Calendar,
   ChevronLeft,
@@ -112,9 +110,20 @@ export function FreightHistoryManagement() {
   });
 
   // Métricas calculadas
-  const cubageAppliedCount = items.filter(
-    (i) => parseFloat(i.volumetricWeightKg) > parseFloat(i.actualWeightKg),
-  ).length;
+  const validCheapestPrices = items
+    .map((i) => (i.cheapestPrice ? parseFloat(i.cheapestPrice) : null))
+    .filter((p): p is number => p !== null && !isNaN(p));
+
+  const avgCheapestPrice =
+    validCheapestPrices.length > 0
+      ? validCheapestPrices.reduce((acc, curr) => acc + curr, 0) /
+        validCheapestPrices.length
+      : 0;
+
+  const formattedAvgPrice = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(avgCheapestPrice);
 
   const totalQuotesEvaluated = items.reduce(
     (acc, curr) => acc + (Array.isArray(curr.quotes) ? curr.quotes.length : 0),
@@ -182,11 +191,11 @@ export function FreightHistoryManagement() {
       </div>
 
       {/* Métricas Rápidas */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Total Auditadas */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {/* Total de Simulações */}
         <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500">Simulações Auditadas</span>
+            <span className="text-xs font-medium text-zinc-500">Total de Simulações</span>
             <span className="flex size-7 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
               <ShieldCheck className="size-4" />
             </span>
@@ -195,21 +204,19 @@ export function FreightHistoryManagement() {
           <span className="text-[11px] text-zinc-400">Total histórico registrado</span>
         </div>
 
-        {/* Cubagem Aplicada */}
+        {/* Cotação Média / Frete */}
         <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-zinc-500">Cubagem na Página</span>
+            <span className="text-xs font-medium text-zinc-500">Cotação Média / Frete</span>
             <span className="flex size-7 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
-              <AlertTriangle className="size-4" />
+              <Calculator className="size-4" />
             </span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-amber-700">{cubageAppliedCount}</p>
-          <span className="text-[11px] text-zinc-400">
-            {cubageAppliedCount === 1 ? '1 rota com peso cubado' : `${cubageAppliedCount} rotas com peso cubado`}
-          </span>
+          <p className="mt-2 text-2xl font-bold text-amber-700">{formattedAvgPrice}</p>
+          <span className="text-[11px] text-zinc-400">Menor valor médio por simulação</span>
         </div>
 
-        {/* Média de Cotações */}
+        {/* Média de Parceiras / Simulação */}
         <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-zinc-500">Média de Parceiras / Simulação</span>
@@ -219,25 +226,6 @@ export function FreightHistoryManagement() {
           </div>
           <p className="mt-2 text-2xl font-bold text-emerald-700">{avgQuotesPerSim}</p>
           <span className="text-[11px] text-zinc-400">Opções comparadas em média</span>
-        </div>
-
-        {/* Atalho Rápido */}
-        <div className="rounded-2xl border border-amber-200/70 bg-gradient-to-br from-amber-50/60 to-white p-4 shadow-xs flex flex-col justify-between">
-          <div>
-            <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">
-              Roteirização Inteligente
-            </span>
-            <p className="mt-1 text-xs text-amber-800 leading-snug">
-              Calcule prazos e custos instantâneos com todas as suas parceiras.
-            </p>
-          </div>
-          <Link
-            href="/fretes/simular"
-            className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-zinc-950 hover:text-amber-700 transition"
-          >
-            <span>Cotar agora</span>
-            <ArrowRight className="size-3.5" />
-          </Link>
         </div>
       </div>
 

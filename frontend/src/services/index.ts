@@ -6,3 +6,6 @@ export { dashboardService } from './dashboard';
 export { freightService } from './freight';
 export { tenantService } from './tenant';
 export { usersService } from './users';
+export { auditService } from './audit';
+export { cnpjService } from './cnpj';
+export { reportsService } from './reports';
