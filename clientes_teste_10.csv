@@ -1,0 +1,11 @@
+nome;cpf;email;telefone;cep;rua;numero;complemento;cidade;estado
+Carlos Eduardo Silva;12345678901;carlos.silva@email.com;11987654321;01310-100;Avenida Paulista;1000;Apto 42;São Paulo;SP
+Mariana Oliveira Santos;23456789012;mariana.santos@email.com;21998765432;20040-020;Avenida Rio Branco;156;Sala 801;Rio de Janeiro;RJ
+Lucas Fernandes Costa;34567890123;lucas.costa@email.com;31987651234;30130-100;Avenida Afonso Pena;2000;;Belo Horizonte;MG
+Beatriz Lima Souza;45678901234;beatriz.souza@email.com;41991234567;80020-310;Rua das Flores;50;Bloco B;Curitiba;PR
+Rodrigo Pereira Alves;56789012345;rodrigo.alves@email.com;51992345678;90010-270;Rua dos Andradas;300;Andar 3;Porto Alegre;RS
+Camila Rodrigues Lima;67890123456;camila.lima@email.com;71993456789;40020-000;Avenida Sete de Setembro;450;;Salvador;BA
+Felipe Martins Castro;78901234567;felipe.castro@email.com;81994567890;50030-230;Avenida Boa Viagem;1200;Apto 1102;Recife;PE
+Juliana Barbosa Rocha;89012345678;juliana.rocha@email.com;61995678901;70040-010;Setor Comercial Sul;10;Bloco C;Brasília;DF
+Gustavo Henrique Melo;90123456789;gustavo.melo@email.com;85996789012;60165-121;Avenida Beira Mar;800;;Fortaleza;CE
+Fernanda Correia Dias;01234567890;fernanda.dias@email.com;19997890123;13010-001;Rua Barão de Jaguara;250;Sala 12;Campinas;SP

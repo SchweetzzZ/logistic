@@ -95,3 +95,18 @@ export const messageResponseSchema = z.object({
 });
 
 export class MessageResponseDto extends createZodDto(messageResponseSchema) {}
+
+export const customerImportErrorSchema = z.object({
+  row: z.number(),
+  error: z.string(),
+});
+
+export const customerImportResponseSchema = z.object({
+  totalProcessed: z.number(),
+  totalImported: z.number(),
+  errors: z.array(customerImportErrorSchema),
+});
+
+export class CustomerImportResponseDto extends createZodDto(
+  customerImportResponseSchema,
+) {}

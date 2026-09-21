@@ -78,4 +78,52 @@ export const customersService = {
     }
     return { success: true };
   },
+
+  // Importa lista de clientes via upload de arquivo CSV
+  importCsv: async (
+    file: File,
+  ): Promise<{
+    data?: {
+      totalProcessed: number;
+      totalImported: number;
+      errors: { row: number; error: string }[];
+    };
+    error?: string;
+  }> => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const headers: Record<string, string> = {};
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+
+      const response = await fetch(`${baseUrl}/customers/import`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+        headers,
+      });
+
+      const json = await response.json();
+
+      if (!response.ok) {
+        let msg = 'Falha ao importar clientes.';
+        if (json && typeof json === 'object' && 'message' in json) {
+          const m = (json as any).message;
+          msg = Array.isArray(m) ? m.join(', ') : String(m);
+        }
+        return { error: msg };
+      }
+
+      return { data: json };
+    } catch {
+      return { error: 'Erro de conexão com o servidor ao importar o arquivo CSV.' };
+    }
+  },
 };

@@ -8,6 +8,9 @@ import {
   Body,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,7 +19,10 @@ import {
   ApiCreatedResponse,
   ApiBearerAuth,
   ApiQuery,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { CustomerManagementService } from './customer.service';
 import {
@@ -24,6 +30,7 @@ import {
   UpdateCustomerDto,
   CustomerResponseDto,
   MessageResponseDto,
+  CustomerImportResponseDto,
 } from './dto/customer-manegement-dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -38,6 +45,43 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 @Controller('customers')
 export class CustomerManagementController {
   constructor(private readonly customerService: CustomerManagementService) {}
+
+  @Post('import')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Importar clientes em massa via arquivo CSV' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Arquivo CSV com os dados dos clientes',
+        },
+      },
+    },
+  })
+  @ApiOkResponse({
+    type: CustomerImportResponseDto,
+    description: 'Resultado da importação em lote com contadores e erros',
+  })
+  async importCsv(
+    @CurrentTenant() tenantId: string,
+    @CurrentUser('userId') userId: string,
+    @UploadedFile() file?: Express.Multer.File,
+  ): Promise<CustomerImportResponseDto> {
+    if (!file || !file.buffer) {
+      throw new BadRequestException('Nenhum arquivo CSV foi enviado.');
+    }
+    return this.customerService.importCsv(
+      tenantId,
+      file.buffer,
+      userId,
+      file.originalname,
+    );
+  }
 
   @Post()
   @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)

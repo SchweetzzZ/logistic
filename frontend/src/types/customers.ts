@@ -29,3 +29,9 @@ export interface CreateCustomerInput {
 }
 
 export interface UpdateCustomerInput extends Partial<CreateCustomerInput> {}
+
+export interface CustomerImportResult {
+  totalProcessed: number;
+  totalImported: number;
+  errors: { row: number; error: string }[];
+}

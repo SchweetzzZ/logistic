@@ -3,11 +3,12 @@
 import React, { useEffect, useState, useTransition } from 'react';
 import {
   AlertCircle, Building2, CheckCircle2, Edit2, Mail, MapPin, Phone, Plus, Search, Trash2,
-  UsersRound
+  Upload, UsersRound
 } from 'lucide-react';
 import { customersService } from '@/src/services/customers';
 import { Customer, CreateCustomerInput, UpdateCustomerInput } from '@/src/types';
 import { CustomerModal, formatCPF, formatPhone } from './CustomerModal';
+import { CustomerImportModal } from './CustomerImportModal';
 import { DeleteConfirmModal } from '../common/DeleteConfirmModal';
 
 export function CustomersManagement() {
@@ -18,6 +19,7 @@ export function CustomersManagement() {
 
   // Estados dos Modais
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
@@ -176,13 +178,24 @@ export function CustomersManagement() {
           </p>
         </div>
 
-        <button
-          onClick={handleOpenNew}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-zinc-800 cursor-pointer"
-        >
-          <Plus className="size-4 text-amber-400" />
-          <span>Novo Cliente</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setIsImportModalOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 shadow-xs transition hover:bg-zinc-50 cursor-pointer"
+          >
+            <Upload className="size-4 text-amber-500" />
+            <span>Importar CSV</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenNew}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-zinc-800 cursor-pointer"
+          >
+            <Plus className="size-4 text-amber-400" />
+            <span>Novo Cliente</span>
+          </button>
+        </div>
       </div>
 
       {/* Barra de Filtros e Busca */}
@@ -404,6 +417,16 @@ export function CustomersManagement() {
           setCustomerToDelete(null);
         }}
         onConfirm={handleConfirmDelete}
+      />
+
+      {/* Modal de Importação CSV */}
+      <CustomerImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={async () => {
+          await loadCustomers(searchQuery.trim() || undefined);
+          showNotification('success', 'Importação processada com sucesso!');
+        }}
       />
     </div>
   );
