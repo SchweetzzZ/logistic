@@ -81,6 +81,7 @@ export const UserResponseSchema = z.object({
   email: z.string(),
   role: z.string(),
   tenantId: z.string(),
+  authProvider: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 });
@@ -88,8 +89,8 @@ export const UserResponseSchema = z.object({
 export class UserResponseDto extends createZodDto(UserResponseSchema) {}
 
 export const AuthResponseSchema = z.object({
-  user: UserResponseSchema,
-  accessToken: z.string(),
+  user: UserResponseSchema.optional(),
+  accessToken: z.string().optional(),
 });
 
 export class AuthResponseDto extends createZodDto(AuthResponseSchema) {}
@@ -99,3 +100,23 @@ export const MessageResponseSchema = z.object({
 });
 
 export class MessageResponseDto extends createZodDto(MessageResponseSchema) {}
+
+export const RegisterOAuthTenantSchema = z.object({
+  onboardingToken: z.string().min(1, 'Token de onboarding obrigatório'),
+  companyName: z
+    .string()
+    .trim()
+    .min(2, 'O nome da empresa deve ter no mínimo 2 caracteres')
+    .max(150, 'O nome da empresa deve ter no máximo 150 caracteres'),
+  document: z
+    .string()
+    .trim()
+    .min(8, 'O documento deve ter no mínimo 8 caracteres')
+    .max(20, 'O documento deve ter no máximo 20 caracteres')
+    .regex(/^[a-zA-Z0-9.\-/]+$/, 'Documento com formato inválido'),
+});
+
+export class RegisterOAuthTenantDto extends createZodDto(
+  RegisterOAuthTenantSchema,
+) {}
+

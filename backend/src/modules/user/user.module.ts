@@ -5,9 +5,9 @@ import { ConfigModule } from '@nestjs/config';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { TenantModule } from '../tenant/tenant.module';
-
+import { CommonModule } from '../common/common.module';
 @Module({
-  imports: [ConfigModule, TenantModule, JwtModule.register({})],
+  imports: [ConfigModule, TenantModule, CommonModule, JwtModule.register({})],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

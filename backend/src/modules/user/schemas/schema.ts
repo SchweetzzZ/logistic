@@ -14,13 +14,17 @@ export const users = mysqlTable('users', {
     .$defaultFn(() => randomUUID()),
   name: varchar('name', { length: 100 }).notNull(),
   email: varchar('email', { length: 255 }).notNull().unique(),
-  passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+  passwordHash: varchar('password_hash', { length: 255 }),
   role: mysqlEnum('role', ['ADMIN', 'MANAGER', 'OPERATOR'])
     .default('OPERATOR')
     .notNull(),
   tenantId: varchar('tenant_id', { length: 36 })
     .notNull()
     .references(() => tenants.id, { onDelete: 'cascade' }),
+  authProvider: varchar('auth_provider', { length: 30 })
+    .default('LOCAL')
+    .notNull(),
+  providerId: varchar('provider_id', { length: 255 }),
   refreshTokenHash: varchar('refresh_token_hash', { length: 255 }),
   createdAt: timestamp('created_at', { mode: 'string' })
     .default(sql`CURRENT_TIMESTAMP`)
