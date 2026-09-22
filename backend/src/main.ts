@@ -4,9 +4,14 @@ import { cleanupOpenApiDoc, ZodValidationPipe } from 'nestjs-zod';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { AllExceptionsFilter } from './modules/common/filters/all-exceptions.filter';
+import { AppLoggerService } from './modules/observability/app-logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+
+  // 0. Logger Estruturado de Observabilidade
+  const logger = app.get(AppLoggerService);
+  app.useLogger(logger);
 
   // 1. Parser de Cookies (Obrigatório para JWT e Refresh Token HttpOnly)
   app.use(cookieParser());
@@ -47,7 +52,10 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
-  console.log(`🚀 Servidor rodando em http://localhost:${port}/api/docs`);
+  logger.log(
+    `🚀 Servidor rodando em http://localhost:${port}/api/docs`,
+    'Bootstrap',
+  );
 }
 
 void bootstrap();

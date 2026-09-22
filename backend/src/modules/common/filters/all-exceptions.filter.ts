@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ZodValidationException } from 'nestjs-zod';
+import { RequestContext } from '../../observability/request-context.service';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -66,9 +67,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? (message as Record<string, unknown>)
         : { message: String(message) };
 
+    const requestId = RequestContext.getRequestId();
+
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
+      requestId,
       ...payload,
     });
   }

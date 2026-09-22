@@ -12,6 +12,7 @@ import { CarrierManagementModule } from './modules/carrier-management/carrier.mo
 import { FreightModule } from './modules/freight/freight.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { ObservabilityModule } from './modules/observability/observability.module';
 
 import { authConfig } from './config/auth.config';
 
@@ -32,6 +33,7 @@ import { authConfig } from './config/auth.config';
       }),
     }),
     DatabaseModule,
+    ObservabilityModule,
     CommonModule,
     AuditModule,
     NotificationModule,
