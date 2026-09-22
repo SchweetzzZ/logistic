@@ -5,6 +5,8 @@ export interface UserProfile {
   role: string;
   avatarUrl?: string;
   initials?: string;
+  isTwoFactorEnabled?: boolean;
+  authProvider?: string;
 }
 
 export interface CompanyInfo {

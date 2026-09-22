@@ -11,6 +11,8 @@ export const authService = {
           name: data.name,
           email: data.email,
           role: data.role,
+          isTwoFactorEnabled: (data as any).isTwoFactorEnabled ?? false,
+          authProvider: (data as any).authProvider ?? 'LOCAL',
           initials: data.name
             ? data.name
                 .split(' ')

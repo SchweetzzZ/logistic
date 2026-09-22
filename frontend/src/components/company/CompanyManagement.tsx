@@ -25,14 +25,18 @@ import {
   UserPlus,
   Users,
   UsersRound,
+  KeyRound,
 } from 'lucide-react';
 import { tenantService } from '@/src/services/tenant';
 import { usersService } from '@/src/services/users';
+import { authService } from '@/src/services/auth';
+import { api } from '@/src/services/api';
 import type {
   Tenant,
   UserEmployee,
   CreateEmployeeInput,
   UpdateEmployeeInput,
+  UserProfile,
 } from '@/src/types';
 import { EmployeeModal } from './EmployeeModal';
 import { DeleteConfirmModal } from '../common/DeleteConfirmModal';
@@ -48,7 +52,7 @@ export function formatCNPJ(value?: string): string {
 }
 
 export function CompanyManagement() {
-  const [activeTab, setActiveTab] = useState<'details' | 'team'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'team' | 'security'>('details');
 
   // Estados de Tenant
   const [tenant, setTenant] = useState<Tenant | null>(null);
@@ -61,6 +65,9 @@ export function CompanyManagement() {
   const [employees, setEmployees] = useState<UserEmployee[]>([]);
   const [teamLoading, setTeamLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Estado do Usuário Atual
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
 
   // Modais de Colaborador
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -115,9 +122,20 @@ export function CompanyManagement() {
     }
   };
 
+  // Carrega dados do usuário atual (para status de MFA)
+  const loadCurrentUser = async () => {
+    try {
+      const u = await authService.getCurrentUser();
+      setCurrentUser(u);
+    } catch {
+      // Ignora erro
+    }
+  };
+
   useEffect(() => {
     loadTenant();
     loadEmployees();
+    loadCurrentUser();
   }, []);
 
   // Copiar ID do Tenant
@@ -318,6 +336,19 @@ export function CompanyManagement() {
             >
               {employees.length}
             </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('security')}
+            className={`inline-flex items-center gap-2.5 border-b-2 py-3 px-1 text-sm font-semibold transition cursor-pointer ${
+              activeTab === 'security'
+                ? 'border-amber-500 text-amber-600'
+                : 'border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700'
+            }`}
+          >
+            <ShieldCheck className="size-4" />
+            <span>Segurança da Conta</span>
           </button>
         </nav>
       </div>
@@ -706,6 +737,54 @@ export function CompanyManagement() {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ABA 3: SEGURANÇA DA CONTA */}
+      {activeTab === 'security' && (
+        <div className="space-y-6">
+          {/* Informações da Conta e Provedor */}
+          <div className="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-xs space-y-5">
+            <div className="flex items-center gap-3 pb-4 border-b border-zinc-100">
+              <div className="size-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                <ShieldCheck className="size-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-zinc-900">
+                  Segurança & Método de Autenticação
+                </h2>
+                <p className="text-xs text-zinc-500">
+                  Gerencie as credenciais e visualize o método de acesso vinculado à sua conta.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div className="p-3.5 bg-zinc-50 rounded-xl border border-zinc-200/60 space-y-1">
+                <span className="text-zinc-400 font-medium">E-mail Cadastrado</span>
+                <p className="font-semibold text-zinc-900 text-sm">{currentUser?.email || '—'}</p>
+              </div>
+              <div className="p-3.5 bg-zinc-50 rounded-xl border border-zinc-200/60 space-y-1">
+                <span className="text-zinc-400 font-medium">Provedor de Acesso</span>
+                <p className="font-semibold text-zinc-900 text-sm uppercase">
+                  {currentUser?.authProvider || 'LOCAL (E-MAIL E SENHA)'}
+                </p>
+              </div>
+              <div className="p-3.5 bg-zinc-50 rounded-xl border border-zinc-200/60 space-y-1">
+                <span className="text-zinc-400 font-medium">Nível de Permissão</span>
+                <p className="font-semibold text-amber-600 text-sm">
+                  {currentUser?.role || 'COLABORADOR'}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-zinc-50/80 border border-zinc-200/60 p-4 text-xs text-zinc-600 space-y-1 leading-relaxed">
+              <p className="font-medium text-zinc-800">Login Social (OAuth 2.0):</p>
+              <p>
+                Sua organização suporta autenticação unificada via <b>Google</b> e <b>GitHub</b>. Você pode utilizar seu e-mail corporativo correspondente para entrar rapidamente sem necessidade de armazenar senhas locais.
+              </p>
             </div>
           </div>
         </div>
