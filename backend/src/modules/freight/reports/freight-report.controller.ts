@@ -1,5 +1,24 @@
-import { Controller, Post, Get, Body, Param, Res, HttpCode, HttpStatus, UseGuards, NotFoundException, } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiAcceptedResponse, ApiOkResponse, ApiProduces, } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Res,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiParam,
+  ApiAcceptedResponse,
+  ApiOkResponse,
+  ApiProduces,
+} from '@nestjs/swagger';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import type { Response } from 'express';
@@ -24,7 +43,7 @@ export class FreightReportController {
   constructor(
     @InjectQueue('freight-reports')
     private readonly reportsQueue: Queue,
-  ) { }
+  ) {}
 
   @Post('export')
   @HttpCode(HttpStatus.ACCEPTED)
@@ -38,7 +57,11 @@ export class FreightReportController {
     type: ExportReportResponseDto,
     description: 'A geração do relatório foi enfileirada com sucesso',
   })
-  async exportReport(@CurrentTenant() tenantId: string, @CurrentUser('userId') userId: string, @Body() dto: ExportFreightReportDto,): Promise<ExportReportResponseDto> {
+  async exportReport(
+    @CurrentTenant() tenantId: string,
+    @CurrentUser('userId') userId: string,
+    @Body() dto: ExportFreightReportDto,
+  ): Promise<ExportReportResponseDto> {
     const job = await this.reportsQueue.add(
       'generate-report',
       {

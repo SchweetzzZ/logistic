@@ -270,20 +270,40 @@ export class CustomerManagementService {
     // Mapeamento de colunas suportadas (pt e en)
     const headerMap: Record<string, string> = {};
     rawHeaders.forEach((header, index) => {
-      if (header === 'nome' || header === 'name') headerMap.name = String(index);
+      if (header === 'nome' || header === 'name')
+        headerMap.name = String(index);
       else if (header === 'cpf') headerMap.cpf = String(index);
-      else if (header === 'email' || header === 'e-mail') headerMap.email = String(index);
-      else if (header === 'telefone' || header === 'phone' || header === 'celular' || header === 'tel')
+      else if (header === 'email' || header === 'e-mail')
+        headerMap.email = String(index);
+      else if (
+        header === 'telefone' ||
+        header === 'phone' ||
+        header === 'celular' ||
+        header === 'tel'
+      )
         headerMap.phone = String(index);
-      else if (header === 'cep' || header === 'zipcode' || header === 'zip_code')
+      else if (
+        header === 'cep' ||
+        header === 'zipcode' ||
+        header === 'zip_code'
+      )
         headerMap.zipCode = String(index);
-      else if (header === 'rua' || header === 'street' || header === 'logradouro' || header === 'endereco')
+      else if (
+        header === 'rua' ||
+        header === 'street' ||
+        header === 'logradouro' ||
+        header === 'endereco'
+      )
         headerMap.street = String(index);
       else if (header === 'numero' || header === 'number' || header === 'nro')
         headerMap.number = String(index);
       else if (header === 'complemento' || header === 'complement')
         headerMap.complement = String(index);
-      else if (header === 'cidade' || header === 'city' || header === 'municipio')
+      else if (
+        header === 'cidade' ||
+        header === 'city' ||
+        header === 'municipio'
+      )
         headerMap.city = String(index);
       else if (header === 'estado' || header === 'state' || header === 'uf')
         headerMap.state = String(index);
@@ -358,7 +378,8 @@ export class CustomerManagementService {
       if (!name || name.length < 2) {
         errors.push({
           row: rowNumber,
-          error: 'Nome do cliente é obrigatório e deve ter no mínimo 2 caracteres',
+          error:
+            'Nome do cliente é obrigatório e deve ter no mínimo 2 caracteres',
         });
         continue;
       }

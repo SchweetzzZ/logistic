@@ -1,7 +1,16 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags, ApiOkResponse, } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiTags,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { AuditService } from './audit.service';
-import { AuditFilterDto, AuditLogPaginatedResponseDto, AuditLogDetailResponseDto, } from './dto/audit.dto';
+import {
+  AuditFilterDto,
+  AuditLogPaginatedResponseDto,
+  AuditLogDetailResponseDto,
+} from './dto/audit.dto';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../common/enums/role.enum';
@@ -13,7 +22,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('audit')
 export class AuditController {
-  constructor(private readonly auditService: AuditService) { }
+  constructor(private readonly auditService: AuditService) {}
 
   @Get()
   @Roles(Role.ADMIN, Role.MANAGER)
@@ -23,7 +32,8 @@ export class AuditController {
   })
   @ApiOkResponse({
     type: AuditLogPaginatedResponseDto,
-    description: 'Lista paginada de registros de auditoria com dados do usuário',
+    description:
+      'Lista paginada de registros de auditoria com dados do usuário',
   })
   async findAll(
     @CurrentTenant() tenantId: string,
@@ -42,7 +52,10 @@ export class AuditController {
     type: AuditLogDetailResponseDto,
     description: 'Detalhes do registro de auditoria',
   })
-  async findById(@CurrentTenant() tenantId: string, @Param('id') id: string,): Promise<AuditLogDetailResponseDto> {
+  async findById(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+  ): Promise<AuditLogDetailResponseDto> {
     return this.auditService.findById(tenantId, id);
   }
 }

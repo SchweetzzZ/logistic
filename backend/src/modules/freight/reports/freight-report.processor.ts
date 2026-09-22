@@ -32,7 +32,9 @@ export class FreightReportProcessor extends WorkerHost {
     }
   }
 
-  async process(job: Job<FreightReportJobData>): Promise<{ filePath: string; totalRecords: number }> {
+  async process(
+    job: Job<FreightReportJobData>,
+  ): Promise<{ filePath: string; totalRecords: number }> {
     this.logger.log(
       `Iniciando processamento do Job ${job.id} para tenant ${job.data.tenantId}`,
     );
@@ -49,7 +51,9 @@ export class FreightReportProcessor extends WorkerHost {
     }
 
     // Busca os dados no MySQL através do Drizzle
-    const records = await this.db.select().from(auditFreightSchema)
+    const records = await this.db
+      .select()
+      .from(auditFreightSchema)
       .where(and(...conditions))
       .orderBy(desc(auditFreightSchema.createdAt))
       .limit(limit);

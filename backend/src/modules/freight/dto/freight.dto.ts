@@ -8,18 +8,32 @@ export const packageDimensionsSchema = z.object({
 });
 
 export const simulateFreightSchema = z.object({
-  destinationZipCode: z.string().trim().transform((val) => val.replace(/\D/g, ''))
-    .refine((val) => val.length === 8, 'O CEP de destino deve conter 8 dígitos',),
-  originZipCode: z.string().trim().transform((val) => val.replace(/\D/g, ''))
+  destinationZipCode: z
+    .string()
+    .trim()
+    .transform((val) => val.replace(/\D/g, ''))
+    .refine(
+      (val) => val.length === 8,
+      'O CEP de destino deve conter 8 dígitos',
+    ),
+  originZipCode: z
+    .string()
+    .trim()
+    .transform((val) => val.replace(/\D/g, ''))
     .refine((val) => val.length === 8, 'O CEP de origem deve conter 8 dígitos')
     .optional(),
   weight: z.number().positive('O peso real deve ser maior que zero (em kg)'),
   dimensions: packageDimensionsSchema,
-  declaredValue: z.number().min(0, 'O valor declarado da carga não pode ser negativo'),
-  carrierId: z.string().uuid('O ID da transportadora deve ser um UUID válido').optional(),
+  declaredValue: z
+    .number()
+    .min(0, 'O valor declarado da carga não pode ser negativo'),
+  carrierId: z
+    .string()
+    .uuid('O ID da transportadora deve ser um UUID válido')
+    .optional(),
 });
 
-export class SimulateFreightDto extends createZodDto(simulateFreightSchema) { }
+export class SimulateFreightDto extends createZodDto(simulateFreightSchema) {}
 
 export const locationInfoSchema = z.object({
   zipCode: z.string(),
@@ -64,7 +78,7 @@ export const simulationResultSchema = z.object({
 
 export class SimulateFreightResponseDto extends createZodDto(
   simulationResultSchema,
-) { }
+) {}
 
 export const freightHistoryItemSchema = z.object({
   id: z.string(),
@@ -102,4 +116,4 @@ export const freightHistoryResponseSchema = z.object({
 
 export class FreightHistoryResponseDto extends createZodDto(
   freightHistoryResponseSchema,
-) { }
+) {}

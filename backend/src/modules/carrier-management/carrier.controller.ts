@@ -1,7 +1,27 @@
-import { Controller, Post, Patch, Get, Param, Body, Delete, UseGuards, } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Patch,
+  Get,
+  Param,
+  Body,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiCreatedResponse,
+} from '@nestjs/swagger';
 import { carrierService } from './carrier.service';
-import { CreateCarrierDto, UpdateCarrierDto, CarrierResponseDto, CarrierMessageResponseDto } from './dto/carrier-dto';
+import {
+  CreateCarrierDto,
+  UpdateCarrierDto,
+  CarrierResponseDto,
+  CarrierMessageResponseDto,
+} from './dto/carrier-dto';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -14,7 +34,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('carriers')
 export class carrierController {
-  constructor(private readonly carrierService: carrierService) { }
+  constructor(private readonly carrierService: carrierService) {}
 
   @Post()
   @Roles(Role.ADMIN, Role.MANAGER)
