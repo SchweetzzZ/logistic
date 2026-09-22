@@ -43,7 +43,7 @@ export function Footer() {
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <a href="/simular-frete" className="hover:text-zinc-900 transition">
+                <a href="/fretes/simular" className="hover:text-zinc-900 transition">
                   Simulação de frete
                 </a>
               </li>

@@ -198,7 +198,7 @@ export function CustomerModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ex: Ana Maria Silva"
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:border-amber-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
               />
             </div>
 
@@ -213,7 +213,7 @@ export function CustomerModal({
                 onChange={(e) => setCpf(formatCPF(e.target.value))}
                 placeholder="000.000.000-00"
                 maxLength={14}
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm font-mono text-zinc-900 transition focus:border-amber-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm font-mono text-zinc-900 transition focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
               />
             </div>
 
@@ -227,7 +227,7 @@ export function CustomerModal({
                 onChange={(e) => setPhone(formatPhone(e.target.value))}
                 placeholder="(00) 00000-0000"
                 maxLength={15}
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:border-amber-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
               />
             </div>
 
@@ -240,7 +240,7 @@ export function CustomerModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="cliente@exemplo.com.br"
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:border-amber-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
               />
             </div>
           </div>
@@ -272,7 +272,7 @@ export function CustomerModal({
                     }}
                     placeholder="00000-000"
                     maxLength={9}
-                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 pr-9 text-sm font-mono text-zinc-900 transition focus:border-amber-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 pr-9 text-sm font-mono text-zinc-900 transition focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
                   />
                   <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400">
                     {loadingCep ? (
@@ -293,7 +293,7 @@ export function CustomerModal({
                   value={street}
                   onChange={(e) => setStreet(e.target.value)}
                   placeholder="Av. Paulista, Rua das Flores"
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:border-amber-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
                 />
               </div>
 
@@ -306,7 +306,7 @@ export function CustomerModal({
                   value={number}
                   onChange={(e) => setNumber(e.target.value)}
                   placeholder="123 ou S/N"
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:border-amber-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
                 />
               </div>
 
@@ -319,7 +319,7 @@ export function CustomerModal({
                   value={complement}
                   onChange={(e) => setComplement(e.target.value)}
                   placeholder="Apto 42, Bloco B, Galpão 3"
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:border-amber-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
                 />
               </div>
 
@@ -332,7 +332,7 @@ export function CustomerModal({
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="São Paulo"
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:border-amber-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm text-zinc-900 transition focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
                 />
               </div>
 
@@ -346,7 +346,7 @@ export function CustomerModal({
                   onChange={(e) => setState(e.target.value.toUpperCase())}
                   placeholder="SP"
                   maxLength={2}
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm uppercase font-semibold text-zinc-900 transition focus:border-amber-500 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 px-3.5 py-2.5 text-sm uppercase font-semibold text-zinc-900 transition focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
                 />
               </div>
             </div>

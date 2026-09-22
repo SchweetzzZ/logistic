@@ -253,8 +253,8 @@ export function AuditDetailModal({ isOpen, item, onClose }: AuditDetailModalProp
                   <button
                     onClick={() => setActiveTab('formatted')}
                     className={`rounded-md px-2.5 py-1 transition cursor-pointer ${activeTab === 'formatted'
-                        ? 'bg-white font-semibold text-zinc-900 shadow-2xs'
-                        : 'text-zinc-600 hover:text-zinc-900'
+                      ? 'bg-white font-semibold text-zinc-900 shadow-2xs'
+                      : 'text-zinc-600 hover:text-zinc-900'
                       }`}
                   >
                     Formatado
@@ -262,8 +262,8 @@ export function AuditDetailModal({ isOpen, item, onClose }: AuditDetailModalProp
                   <button
                     onClick={() => setActiveTab('raw')}
                     className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 transition cursor-pointer ${activeTab === 'raw'
-                        ? 'bg-white font-semibold text-zinc-900 shadow-2xs'
-                        : 'text-zinc-600 hover:text-zinc-900'
+                      ? 'bg-white font-semibold text-zinc-900 shadow-2xs'
+                      : 'text-zinc-600 hover:text-zinc-900'
                       }`}
                   >
                     <Code2 className="size-3.5" />
@@ -300,7 +300,7 @@ export function AuditDetailModal({ isOpen, item, onClose }: AuditDetailModalProp
                   {Object.entries(item.details!).map(([key, val]) => (
                     <div
                       key={key}
-                      className="flex flex-col sm:flex-row sm:items-start justify-between gap-1 border-b border-zinc-200/40 pb-2 last:border-0 last:pb-0"
+                      className="flex flex-col sm:flex-row sm:items-start justify-between gap-1 border-b border-zinc-200/40 pb-2 last:border-0"
                     >
                       <span className="font-mono text-xs font-semibold text-zinc-600 sm:w-1/3">
                         {key}:

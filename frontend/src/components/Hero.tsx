@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-zinc-200 bg-white px-4 pb-24 pt-36 sm:px-6 md:pb-32 md:pt-48 lg:px-8">
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[34rem] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-100/70 via-white to-white" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-136 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-amber-100/70 via-white to-white" />
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         <p className="mb-6 text-sm font-medium tracking-[0.14em] text-amber-700 uppercase">Inteligência logística para empresas</p>
         <h1 className="mx-auto max-w-4xl text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-6xl sm:leading-[1.08]">
@@ -14,7 +14,7 @@ export function Hero() {
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
-            href="/simular-frete"
+            href="/fretes/simular"
             className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 px-6 py-3.5 text-sm font-semibold text-zinc-950 shadow-sm transition hover:bg-amber-400 hover:shadow-amber-500/20 sm:w-auto"
           >
             Simular frete agora <ArrowRight className="size-4" aria-hidden="true" />

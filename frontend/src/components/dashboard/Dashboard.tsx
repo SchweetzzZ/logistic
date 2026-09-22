@@ -4,28 +4,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  ArrowDownRight,
-  ArrowRight,
-  ArrowUpRight,
-  BarChart3,
-  Bell,
-  Calculator,
-  ChevronDown,
-  ChevronsUpDown,
-  CircleHelp,
-  FileBarChart,
-  FileText,
-  History,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  MoreHorizontal,
-  Search,
-  Settings,
-  ShieldCheck,
-  Truck,
-  UsersRound,
-  X,
+  ArrowDownRight, ArrowRight, ArrowUpRight, BarChart3, Bell, Calculator, ChevronDown, ChevronsUpDown,
+  CircleHelp, FileBarChart, FileText, History, LayoutDashboard, LogOut, Menu, MoreHorizontal,
+  Search, Settings, ShieldCheck, Truck, UsersRound, X,
 } from 'lucide-react';
 import { authService } from '@/src/services/auth';
 import { dashboardService } from '@/src/services/dashboard';
@@ -111,8 +92,8 @@ function SidebarContent({
                 href={href}
                 onClick={onClose}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${active
-                    ? 'bg-amber-50 font-semibold text-zinc-950 ring-1 ring-amber-200/80 shadow-xs'
-                    : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950'
+                  ? 'bg-amber-50 font-semibold text-zinc-950 ring-1 ring-amber-200/80 shadow-xs'
+                  : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950'
                   }`}
               >
                 <Icon
@@ -415,10 +396,10 @@ export function Dashboard() {
                   </p>
                   <p
                     className={`mt-2 flex items-center gap-1 text-xs font-medium ${positive === null
-                        ? 'text-zinc-500'
-                        : positive
-                          ? 'text-emerald-700'
-                          : 'text-zinc-500'
+                      ? 'text-zinc-500'
+                      : positive
+                        ? 'text-emerald-700'
+                        : 'text-zinc-500'
                       }`}
                   >
                     {positive !== null &&
