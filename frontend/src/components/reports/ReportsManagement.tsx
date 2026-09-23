@@ -247,7 +247,7 @@ export function ReportsManagement() {
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-2xs focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-2xs focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
                 <Calendar className="pointer-events-none absolute right-3 top-2.5 size-4 text-zinc-400" />
               </div>
@@ -263,7 +263,7 @@ export function ReportsManagement() {
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-2xs focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-2xs focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
                 <Calendar className="pointer-events-none absolute right-3 top-2.5 size-4 text-zinc-400" />
               </div>
@@ -277,7 +277,7 @@ export function ReportsManagement() {
               <select
                 value={limit}
                 onChange={(e) => setLimit(Number(e.target.value))}
-                className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-2xs focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer"
+                className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-2xs focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer"
               >
                 <option value={100}>100 registros (Rápido)</option>
                 <option value={500}>500 registros</option>

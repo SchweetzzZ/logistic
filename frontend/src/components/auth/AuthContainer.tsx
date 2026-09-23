@@ -26,7 +26,7 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialTab = 'logi
   return (
     <main className="min-h-screen w-full bg-[#fcfcfd] text-zinc-900 font-sans selection:bg-amber-500/20 selection:text-zinc-900 flex flex-col justify-between">
       <div className="w-full flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-screen">
-        
+
         {/* Coluna esquerda: Apresentação Institucional em Dark Theme */}
         <aside aria-label="Apresentação institucional" className="hidden lg:block lg:col-span-5 xl:col-span-5 bg-zinc-950 relative border-r border-zinc-900 overflow-hidden">
           <BrandingHero />
@@ -34,7 +34,7 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialTab = 'logi
 
         {/* Coluna direita: Painel amplo de autenticação corporativa */}
         <section aria-label="Painel de autenticação" className="col-span-1 lg:col-span-7 xl:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-16 xl:p-20 bg-white">
-          
+
           {/* Top Bar: Voltar para a LogiFlow & Mobile Brand */}
           <div className="flex items-center justify-between w-full max-w-lg mx-auto">
             <Link
@@ -43,7 +43,7 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({ initialTab = 'logi
               className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors group cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-              <span>Voltar para a LogiFlow</span>
+              <span>Voltar para o início</span>
             </Link>
 
             {/* Mobile-only brand badge */}

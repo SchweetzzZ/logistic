@@ -49,10 +49,6 @@ export const BrandingHero: React.FC = () => {
 
       {/* Seção Central: Proposta de Valor Corporativa */}
       <div className="relative z-10 max-w-sm space-y-3 my-auto py-12">
-        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 border border-amber-500/25 text-amber-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-          Acesso Corporativo Seguro
-        </div>
         <h2 className="text-3xl font-bold tracking-tight text-white leading-tight">
           Inteligência logística para empresas
         </h2>

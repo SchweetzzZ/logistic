@@ -119,7 +119,7 @@ function SidebarContent({
                   }`}
               >
                 <Icon
-                  className={`size-[18px] shrink-0 ${active ? 'text-amber-700' : 'text-zinc-500'
+                  className={`size-4.5 shrink-0 ${active ? 'text-amber-700' : 'text-zinc-500'
                     }`}
                   aria-hidden="true"
                 />
@@ -135,7 +135,7 @@ function SidebarContent({
             onClick={onClose}
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-950"
           >
-            <Settings className="size-[18px] shrink-0 text-zinc-500" aria-hidden="true" />
+            <Settings className="size-4.5 shrink-0 text-zinc-500" aria-hidden="true" />
             <span className="truncate">Empresa e configurações</span>
           </Link>
           <a
@@ -143,7 +143,7 @@ function SidebarContent({
             onClick={onClose}
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50 hover:text-zinc-950"
           >
-            <CircleHelp className="size-[18px] shrink-0 text-zinc-500" aria-hidden="true" />
+            <CircleHelp className="size-4.5 shrink-0 text-zinc-500" aria-hidden="true" />
             <span className="truncate">Central de ajuda</span>
           </a>
         </div>

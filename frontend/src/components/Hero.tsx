@@ -1,8 +1,8 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown } from 'lucide-react';
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden border-b border-zinc-200 bg-white px-4 pb-24 pt-36 sm:px-6 md:pb-32 md:pt-48 lg:px-8">
+    <section className="relative overflow-hidden border-b border-zinc-200 bg-white px-4 pb-10 pt-36 sm:px-6 md:pb-12 md:pt-48 lg:px-8">
       <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-136 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-amber-100/70 via-white to-white" />
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         <p className="mb-6 text-sm font-medium tracking-[0.14em] text-amber-700 uppercase">Inteligência logística para empresas</p>
@@ -14,19 +14,42 @@ export function Hero() {
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
-            href="/fretes/simular"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 px-6 py-3.5 text-sm font-semibold text-zinc-950 shadow-sm transition hover:bg-amber-400 hover:shadow-amber-500/20 sm:w-auto"
+            href="#planos"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 px-7 py-3.5 text-sm font-semibold text-zinc-950 shadow-sm transition hover:bg-amber-400 hover:shadow-amber-500/20 sm:w-auto"
           >
-            Simular frete agora <ArrowRight className="size-4" aria-hidden="true" />
-          </a>
-          <a
-            href="/register"
-            className="inline-flex w-full items-center justify-center rounded-lg border border-zinc-300 bg-white px-6 py-3.5 text-sm font-semibold text-zinc-800 transition hover:border-zinc-400 hover:bg-zinc-50 sm:w-auto"
-          >
-            Cadastrar empresa
+            Conhecer planos & cadastrar <ArrowRight className="size-4" aria-hidden="true" />
           </a>
         </div>
-        <p className="mt-6 text-xs text-zinc-500">Operação separada por empresa, usuários e transportadoras autorizadas.</p>
+
+        {/* Micro-badges de confiança */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs font-medium text-zinc-600">
+          <span className="inline-flex items-center gap-1.5">
+            <Check className="size-3.5 text-amber-600" aria-hidden="true" />
+            14 dias de teste grátis
+          </span>
+          <span className="hidden text-zinc-300 sm:inline" aria-hidden="true">•</span>
+          <span className="inline-flex items-center gap-1.5">
+            <Check className="size-3.5 text-amber-600" aria-hidden="true" />
+            Sem cartão de crédito
+          </span>
+          <span className="hidden text-zinc-300 sm:inline" aria-hidden="true">•</span>
+          <span className="inline-flex items-center gap-1.5">
+            <Check className="size-3.5 text-amber-600" aria-hidden="true" />
+            Ativação imediata
+          </span>
+        </div>
+
+        {/* Indicador sutil de continuidade */}
+        <div className="mt-8 flex justify-center">
+          <a
+            href="#como-funciona"
+            className="group inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-zinc-400 transition hover:text-amber-600 focus:outline-none"
+            aria-label="Rolar para a seção Como funciona"
+          >
+            <span>Como funciona</span>
+            <ChevronDown className="size-3.5 animate-bounce transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
+          </a>
+        </div>
       </div>
     </section>
   );

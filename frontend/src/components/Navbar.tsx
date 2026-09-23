@@ -65,6 +65,9 @@ export function Navbar() {
           <a href="#para-sua-operacao" className="hover:text-zinc-900 transition duration-150">
             Para sua operação
           </a>
+          <a href="#planos" className="hover:text-zinc-900 transition duration-150">
+            Planos
+          </a>
         </nav>
 
         {/* LADO DIREITO */}
@@ -126,6 +129,13 @@ export function Navbar() {
               className="text-left py-1 hover:text-zinc-900"
             >
               Para sua operação
+            </a>
+            <a
+              href="#planos"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-left py-1 hover:text-zinc-900"
+            >
+              Planos
             </a>
           </div>
 

@@ -185,7 +185,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="nome@suaempresa.com.br"
-            className="w-full px-3.5 py-2.5 sm:py-3 text-sm rounded-xl bg-white border border-zinc-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all placeholder:text-zinc-400 shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full px-3.5 py-2.5 sm:py-3 text-sm rounded-xl bg-white border focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all placeholder:text-zinc-400 shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -219,7 +219,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
-              className="w-full pl-3.5 pr-10 py-2.5 sm:py-3 text-sm rounded-xl bg-white border border-zinc-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all placeholder:text-zinc-400 shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full pl-3.5 pr-10 py-2.5 sm:py-3 text-sm rounded-xl bg-white border focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all placeholder:text-zinc-400 shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed"
             />
             <button
               type="button"

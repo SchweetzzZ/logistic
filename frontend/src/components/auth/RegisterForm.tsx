@@ -9,6 +9,16 @@ interface RegisterFormProps {
   onBackToLogin?: () => void;
 }
 
+export const formatCNPJ = (value: string): string => {
+  return value
+    .replace(/\D/g, '')
+    .slice(0, 14)
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/, '.$1/$2')
+    .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+};
+
 export const RegisterForm: React.FC<RegisterFormProps> = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -43,7 +53,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = () => {
   }, [isOAuthOnboarding, oauthName, oauthEmail]);
 
   const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    const finalValue = field === 'cnpj' ? formatCNPJ(value) : value;
+    setFormData((prev) => ({ ...prev, [field]: finalValue }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,6 +69,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = () => {
 
     if (!companyName || !document || !adminName || !email) {
       setErrorMessage('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    const cleanDoc = document.replace(/\D/g, '');
+    if (cleanDoc.length !== 14) {
+      setErrorMessage('Por favor, informe um CNPJ válido com 14 dígitos.');
       return;
     }
 
@@ -191,6 +208,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = () => {
             id="register-cnpj"
             name="cnpj"
             type="text"
+            inputMode="numeric"
+            maxLength={18}
             required
             disabled={loading}
             value={formData.cnpj}

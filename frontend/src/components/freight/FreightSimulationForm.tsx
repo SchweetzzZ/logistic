@@ -307,7 +307,7 @@ export function FreightSimulationForm({
               value={selectedCarrierId}
               onChange={(e) => setSelectedCarrierId(e.target.value)}
               disabled={loadingCarriers}
-              className="w-full rounded-xl border border-zinc-200 bg-zinc-50/60 py-2.5 pl-10 pr-9 text-xs font-medium text-zinc-800 transition focus:border-amber-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20 cursor-pointer appearance-none"
+              className="w-full rounded-xl border py-2.5 pl-10 pr-9 text-xs font-medium text-zinc-800 transition focus:border-amber-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20 cursor-pointer appearance-none"
             >
               <option value="">
                 {loadingCarriers
@@ -351,7 +351,7 @@ export function FreightSimulationForm({
               value={selectedCustomerId}
               onChange={(e) => handleSelectCustomer(e.target.value)}
               disabled={loadingCustomers}
-              className="w-full rounded-xl border border-zinc-200 bg-zinc-50/60 py-2.5 pl-10 pr-8 text-xs font-medium text-zinc-800 transition focus:border-amber-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20 cursor-pointer"
+              className="w-full rounded-xl border py-2.5 pl-10 pr-8 text-xs font-medium text-zinc-800 transition focus:border-amber-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20 cursor-pointer"
             >
               <option value="">
                 {loadingCustomers
@@ -392,7 +392,7 @@ export function FreightSimulationForm({
               maxLength={9}
               className={`w-full rounded-xl border py-2.5 px-3.5 text-sm font-mono text-zinc-900 transition focus:outline-hidden focus:ring-2 ${formErrors.originZipCode
                 ? 'border-red-300 bg-red-50/40 focus:ring-red-300/40'
-                : 'border-zinc-200 bg-zinc-50/50 focus:border-amber-400 focus:bg-white focus:ring-amber-400/20'
+                : 'bg-zinc-50/50 focus:border-amber-400 focus:ring-amber-400/20'
                 }`}
             />
             {formErrors.originZipCode ? (
@@ -428,7 +428,7 @@ export function FreightSimulationForm({
               maxLength={9}
               className={`w-full rounded-xl border py-2.5 px-3.5 text-sm font-mono text-zinc-900 transition focus:outline-hidden focus:ring-2 ${formErrors.destinationZipCode
                 ? 'border-red-300 bg-red-50/40 focus:ring-red-300/40'
-                : 'border-zinc-200 bg-zinc-50/50 focus:border-amber-400 focus:bg-white focus:ring-amber-400/20'
+                : 'bg-zinc-50/50 focus:border-amber-400 focus:ring-amber-400/20'
                 }`}
             />
             {formErrors.destinationZipCode ? (
@@ -508,7 +508,7 @@ export function FreightSimulationForm({
                   setWeight(e.target.value);
                   setActivePreset(null);
                 }}
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 py-2 pl-3 pr-8 text-sm font-semibold text-zinc-900 focus:border-amber-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                className="w-full rounded-xl border bg-zinc-50/50 py-2 pl-3 pr-8 text-sm font-semibold text-zinc-900 focus:border-amber-400 focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-zinc-400 pointer-events-none">
                 kg
@@ -535,7 +535,7 @@ export function FreightSimulationForm({
                   setLength(e.target.value);
                   setActivePreset(null);
                 }}
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 py-2 pl-3 pr-8 text-sm font-semibold text-zinc-900 focus:border-amber-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                className="w-full rounded-xl border bg-zinc-50/50 py-2 pl-3 pr-8 text-sm font-semibold text-zinc-900 focus:border-amber-400 focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-zinc-400 pointer-events-none">
                 cm
@@ -562,7 +562,7 @@ export function FreightSimulationForm({
                   setWidth(e.target.value);
                   setActivePreset(null);
                 }}
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 py-2 pl-3 pr-8 text-sm font-semibold text-zinc-900 focus:border-amber-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                className="w-full rounded-xl border bg-zinc-50/50 py-2 pl-3 pr-8 text-sm font-semibold text-zinc-900 focus:border-amber-400 focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-zinc-400 pointer-events-none">
                 cm
@@ -589,7 +589,7 @@ export function FreightSimulationForm({
                   setHeight(e.target.value);
                   setActivePreset(null);
                 }}
-                className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 py-2 pl-3 pr-8 text-sm font-semibold text-zinc-900 focus:border-amber-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+                className="w-full rounded-xl border bg-zinc-50/50 py-2 pl-3 pr-8 text-sm font-semibold text-zinc-900 focus:border-amber-400 focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-zinc-400 pointer-events-none">
                 cm
@@ -618,7 +618,7 @@ export function FreightSimulationForm({
               value={declaredValue}
               onChange={(e) => setDeclaredValue(e.target.value)}
               placeholder="0.00"
-              className="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 py-2 pl-9 pr-3 text-sm font-semibold text-zinc-900 focus:border-amber-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
+              className="w-full rounded-xl border bg-zinc-50/50 py-2 pl-9 pr-3 text-sm font-semibold text-zinc-900 focus:border-amber-400 focus:outline-hidden focus:ring-2 focus:ring-amber-400/20"
             />
           </div>
           <p className="mt-1 text-[11px] text-zinc-400">
@@ -639,7 +639,7 @@ export function FreightSimulationForm({
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-950 py-3.5 px-6 text-sm font-bold text-white shadow-md hover:bg-zinc-800 active:scale-[0.99] transition disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+        className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-950 py-3.5 px-6 text-sm font-bold text-white shadow-md hover:bg-zinc-800 active:scale-[0.99] transition disabled:opacity-60 cursor-pointer"
       >
         {isLoading ? (
           <>
