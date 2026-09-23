@@ -54,7 +54,7 @@ async function bootstrap() {
   if (!port) {
     throw new Error('A variável de ambiente PORT não foi configurada.');
   }
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   logger.log(
     `🚀 Servidor rodando na porta ${port} (Swagger Docs em: /api/docs)`,
     'Bootstrap',
