@@ -69,12 +69,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = () => {
     try {
       setLoading(true);
 
-      let responseData: any = null;
-      let responseError: any = null;
+      let responseData: { user?: unknown; accessToken?: string } | undefined = undefined;
+      let responseError: unknown = null;
 
       if (isOAuthOnboarding && oauthToken) {
         // Conclusão de onboarding OAuth
-        const res = await (api as any).POST('/user/register-oauth', {
+        const res = await api.POST('/auth/register-oauth', {
           body: {
             onboardingToken: oauthToken,
             companyName,
@@ -85,7 +85,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = () => {
         responseError = res.error;
       } else {
         // Cadastro comum com senha
-        const res = await (api as any).POST('/user/register', {
+        const res = await api.POST('/auth/register', {
           body: {
             companyName,
             document,
@@ -100,11 +100,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = () => {
 
       if (responseError) {
         let msg = 'Falha ao criar ambiente da empresa. Verifique os dados informados.';
-        if (typeof responseError === 'object' && responseError !== null) {
-          if ('message' in responseError && typeof (responseError as any).message === 'string') {
-            msg = (responseError as any).message;
-          } else if ('message' in responseError && Array.isArray((responseError as any).message)) {
-            msg = ((responseError as any).message).join(', ');
+        if (typeof responseError === 'object' && responseError !== null && 'message' in responseError) {
+          const errObj = responseError as { message?: string | string[] };
+          if (typeof errObj.message === 'string') {
+            msg = errObj.message;
+          } else if (Array.isArray(errObj.message)) {
+            msg = errObj.message.join(', ');
           }
         }
         setErrorMessage(msg);
@@ -112,11 +113,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = () => {
       }
 
       if (responseData) {
-        // Armazena informações de autenticação localmente
+        // Armazena informações do usuário localmente para renderização inicial
         try {
-          if (responseData.accessToken) {
-            localStorage.setItem('auth_token', responseData.accessToken);
-          }
           if (responseData.user) {
             localStorage.setItem('auth_user', JSON.stringify(responseData.user));
           }

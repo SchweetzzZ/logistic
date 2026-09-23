@@ -13,11 +13,7 @@ function OAuthCallbackContent() {
     const error = searchParams.get('error');
 
     if (token) {
-      try {
-        localStorage.setItem('auth_token', token);
-      } catch {
-        // Ignora falha de localstorage
-      }
+      // Cookies HttpOnly já foram definidos pelo backend durante o callback OAuth
       router.push('/dashboard');
       return;
     }

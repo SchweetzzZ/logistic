@@ -2,7 +2,7 @@ export function Footer() {
   return (
     <footer className="bg-zinc-50 border-t border-zinc-200 pt-16 pb-12 text-zinc-600 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Barra superior do footer com status sóbrio */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-10 border-b border-zinc-200">
           <div className="flex items-center gap-3">
@@ -24,18 +24,11 @@ export function Footer() {
             <span className="text-zinc-300">|</span>
             <span className="text-xs text-zinc-500">Gestão e simulação inteligente de fretes B2B</span>
           </div>
-
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white border border-zinc-200 text-xs text-zinc-700 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>Ambiente corporativo</span>
-            <span className="text-zinc-300">•</span>
-            <span className="text-zinc-500 font-mono">multi-tenant</span>
-          </div>
         </div>
 
         {/* Links organizados por categorias */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10">
-          
+
           {/* Categoria 1: Produto */}
           <div>
             <h4 className="text-xs font-semibold text-zinc-900 mb-3.5">
@@ -117,11 +110,6 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} LogiFlow. Todos os direitos reservados.
           </p>
-          <div className="flex items-center gap-4 text-[11px] font-mono text-zinc-400">
-            <span>Ambiente multi-tenant</span>
-            <span>•</span>
-            <span>v2.5</span>
-          </div>
         </div>
 
       </div>

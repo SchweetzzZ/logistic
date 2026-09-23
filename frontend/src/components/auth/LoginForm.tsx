@@ -10,6 +10,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { api } from '@/src/services/api';
+import { API_BASE_URL } from '@/src/config/api.config';
 
 interface LoginFormProps {
   onForgotPasswordClick?: () => void;
@@ -27,7 +28,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const apiUrl = API_BASE_URL;
 
   // Verifica se veio redirecionado com erro de OAuth
   useEffect(() => {
@@ -56,7 +57,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     try {
       setLoading(true);
 
-      const { data, error } = await (api as any).POST('/user/login', {
+      const { data, error } = await api.POST('/auth/login', {
         body: {
           email: trimmedEmail,
           password,
@@ -65,11 +66,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       if (error) {
         let msg = 'Falha ao autenticar. Verifique suas credenciais.';
-        if (typeof error === 'object' && error !== null) {
-          if ('message' in error && typeof (error as any).message === 'string') {
-            msg = (error as any).message;
-          } else if ('message' in error && Array.isArray((error as any).message)) {
-            msg = (error as any).message.join(', ');
+        if (typeof error === 'object' && error !== null && 'message' in error) {
+          const errObj = error as { message?: string | string[] };
+          if (typeof errObj.message === 'string') {
+            msg = errObj.message;
+          } else if (Array.isArray(errObj.message)) {
+            msg = errObj.message.join(', ');
           }
         }
         setErrorMessage(msg);
@@ -77,10 +79,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       }
 
       if (data) {
-        // Login direto bem-sucedido:
-        if (data.accessToken) {
-          localStorage.setItem('auth_token', data.accessToken);
-        }
+        // Login direto bem-sucedido (tokens armazenados em cookies HttpOnly pelo backend)
         if (data.user) {
           localStorage.setItem('auth_user', JSON.stringify(data.user));
         }
@@ -118,7 +117,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       {/* Botões de Login Social (OAuth) */}
       <div className="grid grid-cols-2 gap-2.5 pt-1">
         <a
-          href={`${apiUrl}/user/auth/google`}
+          href={`${apiUrl}/auth/google`}
           className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50/80 active:scale-[0.98] transition-all text-xs sm:text-sm font-medium text-zinc-700 shadow-2xs"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -143,7 +142,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </a>
 
         <a
-          href={`${apiUrl}/user/auth/github`}
+          href={`${apiUrl}/auth/github`}
           className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50/80 active:scale-[0.98] transition-all text-xs sm:text-sm font-medium text-zinc-700 shadow-2xs"
         >
           <svg className="w-4 h-4 fill-zinc-900" viewBox="0 0 24 24">

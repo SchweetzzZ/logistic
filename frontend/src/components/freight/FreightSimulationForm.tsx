@@ -291,7 +291,6 @@ export function FreightSimulationForm({
             </span>
             <h3 className="text-sm font-bold text-zinc-950">Transportadora</h3>
           </div>
-          <span className="text-[11px] text-zinc-400">Filtro Opcional</span>
         </div>
 
         <div>
@@ -323,9 +322,6 @@ export function FreightSimulationForm({
             </select>
             <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none" />
           </div>
-          <p className="mt-1.5 text-[11px] text-zinc-400">
-            Selecione uma parceira específica para cotação direta ou compare todas as opções cadastradas.
-          </p>
         </div>
       </div>
 
@@ -338,7 +334,6 @@ export function FreightSimulationForm({
             </span>
             <h3 className="text-sm font-bold text-zinc-950">Dados da Rota</h3>
           </div>
-          <span className="text-[11px] text-zinc-400">Origem & Destino</span>
         </div>
 
         {/* Atalho Cliente Cadastrado */}
@@ -395,11 +390,10 @@ export function FreightSimulationForm({
               }}
               placeholder="01001-000"
               maxLength={9}
-              className={`w-full rounded-xl border py-2.5 px-3.5 text-sm font-mono text-zinc-900 transition focus:outline-hidden focus:ring-2 ${
-                formErrors.originZipCode
-                  ? 'border-red-300 bg-red-50/40 focus:ring-red-300/40'
-                  : 'border-zinc-200 bg-zinc-50/50 focus:border-amber-400 focus:bg-white focus:ring-amber-400/20'
-              }`}
+              className={`w-full rounded-xl border py-2.5 px-3.5 text-sm font-mono text-zinc-900 transition focus:outline-hidden focus:ring-2 ${formErrors.originZipCode
+                ? 'border-red-300 bg-red-50/40 focus:ring-red-300/40'
+                : 'border-zinc-200 bg-zinc-50/50 focus:border-amber-400 focus:bg-white focus:ring-amber-400/20'
+                }`}
             />
             {formErrors.originZipCode ? (
               <p className="mt-1 text-[11px] font-medium text-red-600 flex items-center gap-1">
@@ -432,11 +426,10 @@ export function FreightSimulationForm({
               }}
               placeholder="00000-000"
               maxLength={9}
-              className={`w-full rounded-xl border py-2.5 px-3.5 text-sm font-mono text-zinc-900 transition focus:outline-hidden focus:ring-2 ${
-                formErrors.destinationZipCode
-                  ? 'border-red-300 bg-red-50/40 focus:ring-red-300/40'
-                  : 'border-zinc-200 bg-zinc-50/50 focus:border-amber-400 focus:bg-white focus:ring-amber-400/20'
-              }`}
+              className={`w-full rounded-xl border py-2.5 px-3.5 text-sm font-mono text-zinc-900 transition focus:outline-hidden focus:ring-2 ${formErrors.destinationZipCode
+                ? 'border-red-300 bg-red-50/40 focus:ring-red-300/40'
+                : 'border-zinc-200 bg-zinc-50/50 focus:border-amber-400 focus:bg-white focus:ring-amber-400/20'
+                }`}
             />
             {formErrors.destinationZipCode ? (
               <p className="mt-1 text-[11px] font-medium text-red-600 flex items-center gap-1">
@@ -460,7 +453,6 @@ export function FreightSimulationForm({
             </span>
             <h3 className="text-sm font-bold text-zinc-950">Dados da Carga</h3>
           </div>
-          <span className="text-[11px] text-zinc-400">Peso & Dimensões</span>
         </div>
 
         {/* Botões de Predefinições Rápidas */}
@@ -477,11 +469,10 @@ export function FreightSimulationForm({
                   key={preset.id}
                   type="button"
                   onClick={() => handleApplyPreset(preset)}
-                  className={`rounded-xl p-2.5 text-left border transition cursor-pointer flex flex-col justify-between ${
-                    isSelected
-                      ? 'border-amber-400 bg-amber-50/60 ring-2 ring-amber-400/20'
-                      : 'border-zinc-200/80 bg-zinc-50/50 hover:bg-zinc-100/70 hover:border-zinc-300'
-                  }`}
+                  className={`rounded-xl p-2.5 text-left border transition cursor-pointer flex flex-col justify-between ${isSelected
+                    ? 'border-amber-400 bg-amber-50/60 ring-2 ring-amber-400/20'
+                    : 'border-zinc-200/80 bg-zinc-50/50 hover:bg-zinc-100/70 hover:border-zinc-300'
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-zinc-900">{preset.name}</span>

@@ -19,6 +19,7 @@ import {
   X,
 } from 'lucide-react';
 import { authService } from '@/src/services/auth';
+import { onSessionExpired } from '@/src/services/http/auth-events';
 import { CompanyInfo, UserProfile } from '@/src/types';
 import { NotificationProvider } from '@/src/context/NotificationContext';
 import { NotificationBell } from '@/src/components/notifications/NotificationBell';
@@ -112,16 +113,14 @@ function SidebarContent({
                 key={label}
                 href={href}
                 onClick={onClose}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  active
-                    ? 'bg-amber-50 font-semibold text-zinc-950 ring-1 ring-amber-200/80 shadow-xs'
-                    : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950'
-                }`}
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${active
+                  ? 'bg-amber-50 font-semibold text-zinc-950 ring-1 ring-amber-200/80 shadow-xs'
+                  : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950'
+                  }`}
               >
                 <Icon
-                  className={`size-[18px] shrink-0 ${
-                    active ? 'text-amber-700' : 'text-zinc-500'
-                  }`}
+                  className={`size-[18px] shrink-0 ${active ? 'text-amber-700' : 'text-zinc-500'
+                    }`}
                   aria-hidden="true"
                 />
                 <span className="truncate">{label}</span>
@@ -189,6 +188,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [company, setCompany] = useState<CompanyInfo | null>(null);
   const [user, setUser] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    return onSessionExpired(() => {
+      router.push('/login');
+    });
+  }, [router]);
 
   useEffect(() => {
     let isMounted = true;
@@ -269,10 +274,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Topbar Desktop */}
           <header className="hidden lg:flex sticky top-0 z-30 h-16 items-center justify-between border-b border-zinc-200/90 bg-white/95 px-8 backdrop-blur-sm">
             <div className="flex items-center gap-2.5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md ring-1 ring-amber-500/20">
-                LogiFlow Cloud
-              </span>
-              <span className="text-xs text-zinc-300">/</span>
               <span className="text-xs font-medium text-zinc-600">
                 {company?.name || 'Sua Empresa'}
               </span>

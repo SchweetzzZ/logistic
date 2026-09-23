@@ -321,27 +321,11 @@ export function Dashboard() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <button className="hidden items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-500 transition hover:border-zinc-300 sm:flex">
-              <Search className="size-4" aria-hidden="true" />
-              <span>Buscar</span>
-              <kbd className="rounded border border-zinc-200 px-1.5 py-0.5 text-[10px] text-zinc-400">⌘ K</kbd>
-            </button>
             <button
               className="relative rounded-lg p-2 text-zinc-600 transition hover:bg-zinc-100"
               aria-label="Notificações"
             >
               <Bell className="size-5" />
-            </button>
-            <span className="hidden h-6 w-px bg-zinc-200 sm:block" />
-            <button
-              onClick={handleLogout}
-              title="Encerrar sessão"
-              className="hidden items-center gap-2 rounded-lg py-1 pl-1 pr-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 sm:flex cursor-pointer"
-            >
-              <span className="flex size-7 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-900">
-                {user?.initials || 'U'}
-              </span>
-              <LogOut className="size-3.5 text-zinc-400 hover:text-red-600 transition" />
             </button>
           </div>
         </header>

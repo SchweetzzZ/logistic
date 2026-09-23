@@ -195,32 +195,6 @@ export function ReportsManagement() {
             Exporte o histórico analítico de fretes e cotações da sua empresa em formato tabular. Seus relatórios são gerados em segundo plano para que você continue suas atividades sem interrupções.
           </p>
         </div>
-
-        {/* Indicador de Atualização em Tempo Real */}
-        <div className="flex items-center gap-2 self-start rounded-2xl border border-zinc-200 bg-white px-3.5 py-2 shadow-xs sm:self-auto">
-          <span className="relative flex size-2.5">
-            {connectionStatus === 'connected' ? (
-              <>
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex size-2.5 rounded-full bg-emerald-500" />
-              </>
-            ) : connectionStatus === 'connecting' ? (
-              <span className="relative inline-flex size-2.5 rounded-full bg-amber-500 animate-pulse" />
-            ) : (
-              <span className="relative inline-flex size-2.5 rounded-full bg-zinc-400" />
-            )}
-          </span>
-          <div className="text-xs">
-            <span className="font-semibold text-zinc-900 block">Atualização em tempo real</span>
-            <span className="text-zinc-500">
-              {connectionStatus === 'connected'
-                ? 'Conectado'
-                : connectionStatus === 'connecting'
-                  ? 'Conectando...'
-                  : 'Desconectado'}
-            </span>
-          </div>
-        </div>
       </div>
 
       {/* Formulário de Exportação */}

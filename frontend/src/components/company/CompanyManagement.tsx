@@ -285,11 +285,10 @@ export function CompanyManagement() {
       {/* Notificação / Toast */}
       {notification && (
         <div
-          className={`flex items-center gap-3 rounded-2xl border p-4 shadow-xs transition-all ${
-            notification.type === 'success'
-              ? 'border-emerald-200 bg-emerald-50/80 text-emerald-800'
-              : 'border-red-200 bg-red-50/80 text-red-800'
-          }`}
+          className={`flex items-center gap-3 rounded-2xl border p-4 shadow-xs transition-all ${notification.type === 'success'
+            ? 'border-emerald-200 bg-emerald-50/80 text-emerald-800'
+            : 'border-red-200 bg-red-50/80 text-red-800'
+            }`}
         >
           {notification.type === 'success' ? (
             <CheckCircle2 className="size-5 shrink-0 text-emerald-600" />
@@ -306,11 +305,10 @@ export function CompanyManagement() {
           <button
             type="button"
             onClick={() => setActiveTab('details')}
-            className={`inline-flex items-center gap-2.5 border-b-2 py-3 px-1 text-sm font-semibold transition cursor-pointer ${
-              activeTab === 'details'
-                ? 'border-amber-500 text-amber-600'
-                : 'border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700'
-            }`}
+            className={`inline-flex items-center gap-2.5 border-b-2 py-3 px-1 text-sm font-semibold transition cursor-pointer ${activeTab === 'details'
+              ? 'border-amber-500 text-amber-600'
+              : 'border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700'
+              }`}
           >
             <Building2 className="size-4" />
             <span>Dados Cadastrais</span>
@@ -319,20 +317,18 @@ export function CompanyManagement() {
           <button
             type="button"
             onClick={() => setActiveTab('team')}
-            className={`inline-flex items-center gap-2.5 border-b-2 py-3 px-1 text-sm font-semibold transition cursor-pointer ${
-              activeTab === 'team'
-                ? 'border-amber-500 text-amber-600'
-                : 'border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700'
-            }`}
+            className={`inline-flex items-center gap-2.5 border-b-2 py-3 px-1 text-sm font-semibold transition cursor-pointer ${activeTab === 'team'
+              ? 'border-amber-500 text-amber-600'
+              : 'border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700'
+              }`}
           >
             <Users className="size-4" />
             <span>Equipe & Colaboradores</span>
             <span
-              className={`ml-1 rounded-full px-2 py-0.5 text-xs font-bold ${
-                activeTab === 'team'
-                  ? 'bg-amber-100 text-amber-800'
-                  : 'bg-zinc-100 text-zinc-600'
-              }`}
+              className={`ml-1 rounded-full px-2 py-0.5 text-xs font-bold ${activeTab === 'team'
+                ? 'bg-amber-100 text-amber-800'
+                : 'bg-zinc-100 text-zinc-600'
+                }`}
             >
               {employees.length}
             </span>
@@ -341,11 +337,10 @@ export function CompanyManagement() {
           <button
             type="button"
             onClick={() => setActiveTab('security')}
-            className={`inline-flex items-center gap-2.5 border-b-2 py-3 px-1 text-sm font-semibold transition cursor-pointer ${
-              activeTab === 'security'
-                ? 'border-amber-500 text-amber-600'
-                : 'border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700'
-            }`}
+            className={`inline-flex items-center gap-2.5 border-b-2 py-3 px-1 text-sm font-semibold transition cursor-pointer ${activeTab === 'security'
+              ? 'border-amber-500 text-amber-600'
+              : 'border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700'
+              }`}
           >
             <ShieldCheck className="size-4" />
             <span>Segurança da Conta</span>
@@ -397,9 +392,6 @@ export function CompanyManagement() {
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 text-xs text-zinc-500">
-                        Ambiente corporativo multi-tenant isolado e seguro.
-                      </p>
                     </div>
                   </div>
 
@@ -642,11 +634,11 @@ export function CompanyManagement() {
                     filteredEmployees.map((emp) => {
                       const initials = emp.name
                         ? emp.name
-                            .split(' ')
-                            .map((n) => n[0])
-                            .slice(0, 2)
-                            .join('')
-                            .toUpperCase()
+                          .split(' ')
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join('')
+                          .toUpperCase()
                         : '??';
 
                       const formattedDate = emp.createdAt
