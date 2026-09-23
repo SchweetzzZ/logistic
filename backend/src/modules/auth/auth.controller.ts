@@ -40,7 +40,7 @@ export class AuthController {
     res.cookie('jwt', accessToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'lax',
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
       maxAge: 15 * 60 * 1000, // 15 minutos
     });
@@ -48,7 +48,7 @@ export class AuthController {
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'lax',
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
     });
@@ -59,13 +59,13 @@ export class AuthController {
 
     res.clearCookie('jwt', {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
       secure: isProduction,
     });
     res.clearCookie('refresh_token', {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: isProduction ? 'none' : 'lax',
       path: '/',
       secure: isProduction,
     });
