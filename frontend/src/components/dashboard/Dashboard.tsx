@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  ArrowDownRight, ArrowRight, ArrowUpRight, BarChart3, Bell, Calculator, ChevronDown, ChevronsUpDown,
+  ArrowDownRight, ArrowRight, ArrowUpRight, BarChart3, Bell, Calculator, ChevronsUpDown,
   CircleHelp, FileBarChart, FileText, History, LayoutDashboard, LogOut, Menu, MoreHorizontal,
   Search, Settings, ShieldCheck, Truck, UsersRound, X,
 } from 'lucide-react';
@@ -235,6 +235,9 @@ export function Dashboard() {
   const recentQuotes = dashboardData?.recentQuotes ?? [];
   const topCarriers = dashboardData?.topCarriers ?? [];
   const chartSeries = dashboardData?.chartSeries ?? [];
+  const maxQuotes = chartSeries.length > 0 ? Math.max(...chartSeries.map((p) => p.quotesCount)) : 0;
+  const yAxisMax = maxQuotes > 0 ? (maxQuotes <= 4 ? 4 : Math.ceil(maxQuotes * 1.15)) : 4;
+  const totalPeriodQuotes = chartSeries.reduce((acc, curr) => acc + curr.quotesCount, 0);
   const insight = dashboardData?.insight ?? null;
 
   const metricCards = [
@@ -243,7 +246,7 @@ export function Dashboard() {
       value: metricsData ? metricsData.quotesCount.toLocaleString('pt-BR') : '0',
       detail: metricsData?.quotesGrowthPercent != null
         ? `${metricsData.quotesGrowthPercent >= 0 ? '+' : ''}${metricsData.quotesGrowthPercent}%`
-        : undefined,
+        : 'simulações registradas',
       positive: metricsData?.quotesGrowthPercent != null
         ? metricsData.quotesGrowthPercent >= 0
         : null,
@@ -256,7 +259,7 @@ export function Dashboard() {
         : 'R$ 0,00',
       detail: metricsData?.averageCostGrowthPercent != null
         ? `${metricsData.averageCostGrowthPercent >= 0 ? '+' : ''}${metricsData.averageCostGrowthPercent}%`
-        : undefined,
+        : 'média por simulação',
       positive: metricsData?.averageCostGrowthPercent != null
         ? metricsData.averageCostGrowthPercent <= 0
         : null,
@@ -265,9 +268,9 @@ export function Dashboard() {
     {
       label: 'Peso cubado aplicado',
       value: metricsData ? `${metricsData.cubageAppliedPercent}%` : '0%',
-      detail: metricsData?.cubageQuotesCount != null
-        ? `${metricsData.cubageQuotesCount} cotações`
-        : undefined,
+      detail: metricsData?.cubageQuotesCount != null && metricsData.quotesCount > 0
+        ? `${metricsData.cubageQuotesCount} de ${metricsData.quotesCount} ${metricsData.quotesCount === 1 ? 'cotação' : 'cotações'}`
+        : 'nenhuma cotação afetada',
       positive: null,
       icon: Calculator,
     },
@@ -349,9 +352,6 @@ export function Dashboard() {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 shadow-xs transition hover:border-zinc-300 hover:bg-zinc-50">
-                  Últimos 30 dias <ChevronDown className="size-4 text-zinc-400" aria-hidden="true" />
-                </button>
                 <Link
                   href="/fretes/simular"
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
@@ -392,13 +392,11 @@ export function Dashboard() {
                       ) : (
                         <ArrowUpRight className="size-3.5" aria-hidden="true" />
                       ))}
-                    {detail ? (
+                    {detail && (
                       <>
                         {detail}{' '}
                         {positive !== null && <span className="font-normal text-zinc-400">vs. anterior</span>}
                       </>
-                    ) : (
-                      <span className="text-zinc-400">Sem dados comparativos</span>
                     )}
                   </p>
                 </article>
@@ -407,45 +405,108 @@ export function Dashboard() {
 
             {/* Evolução de Cotações & Card de Insight */}
             <section className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(310px,0.75fr)]">
-              <article className="rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-xs sm:p-6">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <h2 className="text-base font-semibold text-zinc-950">Evolução das cotações</h2>
-                    <p className="mt-1 text-sm text-zinc-500">Volume de simulações concluídas no período.</p>
-                  </div>
-                  <button
-                    className="self-start rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700"
-                    aria-label="Mais opções"
-                  >
-                    <MoreHorizontal className="size-5" />
-                  </button>
-                </div>
-
-                {chartSeries.length > 0 ? (
-                  <div className="mt-6 h-56 w-full">
-                    {/* Renderização dinâmica dos pontos do backend */}
-                    <div className="flex h-full items-end justify-between gap-2 pt-6">
-                      {chartSeries.map((point) => (
-                        <div key={point.date} className="flex flex-1 flex-col items-center gap-2">
-                          <div
-                            className="w-full rounded-t bg-amber-400/80 hover:bg-amber-500 transition-all"
-                            style={{ height: `${Math.min(100, Math.max(10, point.quotesCount * 10))}%` }}
-                            title={`${point.label}: ${point.quotesCount} cotações`}
-                          />
-                          <span className="text-[11px] text-zinc-400">{point.label}</span>
-                        </div>
-                      ))}
+              <article className="rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-xs sm:p-6 flex flex-col justify-between">
+                <div>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-base font-semibold text-zinc-950">Evolução das cotações</h2>
+                        {totalPeriodQuotes > 0 && (
+                          <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 ring-1 ring-amber-200/60">
+                            {totalPeriodQuotes} {totalPeriodQuotes === 1 ? 'cotação' : 'cotações'}
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 text-sm text-zinc-500">Volume de simulações concluídas no período.</p>
                     </div>
                   </div>
-                ) : (
-                  <div className="mt-6 flex h-56 flex-col items-center justify-center rounded-xl border border-dashed border-zinc-200 bg-zinc-50/50 p-6 text-center">
-                    <BarChart3 className="size-8 text-zinc-300 mb-2" />
-                    <p className="text-sm font-medium text-zinc-600">Sem dados suficientes para o gráfico</p>
-                    <p className="mt-1 text-xs text-zinc-400 max-w-sm">
-                      O volume de cotações por período será exibido automaticamente conforme novas simulações forem geradas.
-                    </p>
-                  </div>
-                )}
+
+                  {chartSeries.length > 0 ? (
+                    <div className="mt-6 flex flex-col">
+                      {/* Área do gráfico com eixos e barras */}
+                      <div className="relative h-48 w-full">
+                        {/* Linhas de grade horizontais e valores do eixo Y */}
+                        <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-2">
+                          {[yAxisMax, Math.round(yAxisMax / 2), 0].map((tick, idx) => (
+                            <div key={idx} className="flex items-center gap-3 w-full">
+                              <span className="w-5 text-right text-[11px] font-medium text-zinc-400 select-none">
+                                {tick}
+                              </span>
+                              <div className="h-px flex-1 border-b border-dashed border-zinc-100" />
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Colunas do gráfico alinhadas à base */}
+                        <div className="relative ml-8 flex h-full items-end justify-between gap-2 sm:gap-4 pb-2">
+                          {chartSeries.map((point) => {
+                            const pct = yAxisMax > 0 ? Math.min(100, Math.round((point.quotesCount / yAxisMax) * 100)) : 0;
+                            const hasQuotes = point.quotesCount > 0;
+
+                            return (
+                              <div
+                                key={point.date}
+                                className="group relative flex flex-1 h-full flex-col justify-end items-center cursor-pointer"
+                              >
+                                {/* Tooltip flutuante no hover */}
+                                <div className="absolute -top-11 left-1/2 -translate-x-1/2 z-20 hidden group-hover:flex flex-col items-center pointer-events-none whitespace-nowrap animate-in fade-in zoom-in-95 duration-150">
+                                  <div className="rounded-lg bg-zinc-950 px-2.5 py-1 text-[11px] font-semibold text-white shadow-xl">
+                                    <span className="text-amber-400 font-bold mr-1">{point.quotesCount}</span>
+                                    <span>{point.quotesCount === 1 ? 'cotação' : 'cotações'}</span>
+                                    <span className="text-zinc-400 ml-1 font-normal">({point.label})</span>
+                                  </div>
+                                  <div className="size-1.5 rotate-45 bg-zinc-950 -mt-1" />
+                                </div>
+
+                                {/* Coluna com efeito hover sutil */}
+                                <div className="absolute inset-x-0.5 inset-y-0 rounded-lg bg-zinc-100/60 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+                                {/* Barra de valor */}
+                                {hasQuotes ? (
+                                  <div
+                                    className="relative z-10 w-full max-w-[42px] rounded-t-md bg-gradient-to-t from-amber-500 to-amber-400 group-hover:from-amber-600 group-hover:to-amber-500 transition-all duration-300 shadow-xs"
+                                    style={{
+                                      height: `${Math.max(8, pct)}%`,
+                                    }}
+                                  >
+                                    {/* Indicador de valor no topo da barra se houver altura suficiente */}
+                                    {pct >= 30 && (
+                                      <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] font-bold text-zinc-600 group-hover:text-zinc-900 transition-colors">
+                                        {point.quotesCount}
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : (
+                                  /* Marcador discreto de repouso para 0 cotações */
+                                  <div className="relative z-10 h-1.5 w-full max-w-[42px] rounded-full bg-zinc-200/90 group-hover:bg-amber-300 transition-colors" />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Eixo X com datas */}
+                      <div className="ml-8 mt-2 flex items-center justify-between gap-2 sm:gap-4 border-t border-zinc-100 pt-2">
+                        {chartSeries.map((point) => (
+                          <div key={point.date} className="flex-1 text-center">
+                            <span className="text-[11px] font-medium text-zinc-500 hover:text-zinc-900 transition-colors">
+                              {point.label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-6 flex h-56 flex-col items-center justify-center rounded-xl border border-dashed border-zinc-200 bg-zinc-50/50 p-6 text-center">
+                      <BarChart3 className="size-8 text-zinc-300 mb-2" />
+                      <p className="text-sm font-medium text-zinc-600">Sem dados suficientes para o gráfico</p>
+                      <p className="mt-1 text-xs text-zinc-400 max-w-sm">
+                        O volume de cotações por período será exibido automaticamente conforme novas simulações forem geradas.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </article>
 
               {/* Card de Insight / Inteligência da Operação */}

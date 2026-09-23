@@ -7,8 +7,6 @@ import {
   AlertCircle,
   Calculator,
   Calendar,
-  ChevronLeft,
-  ChevronRight,
   History,
   Layers,
   Plus,
@@ -377,42 +375,20 @@ export function FreightHistoryManagement() {
           items={filteredItems}
           onSelectDetail={handleOpenDetail}
           onRepeatSimulation={handleRepeatSimulation}
+          pagination={
+            !loading && total > 0
+              ? {
+                  page,
+                  totalPages,
+                  total,
+                  startRecord,
+                  endRecord,
+                  onPageChange: (newPage) => setPage(newPage),
+                  loading,
+                }
+              : undefined
+          }
         />
-      )}
-
-      {/* Controles de Paginação */}
-      {!loading && total > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-xs">
-          <div className="text-xs text-zinc-500">
-            Mostrando <strong className="font-semibold text-zinc-900">{startRecord}</strong> até{' '}
-            <strong className="font-semibold text-zinc-900">{endRecord}</strong> de{' '}
-            <strong className="font-semibold text-zinc-900">{total}</strong> registros auditados
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1 || loading}
-              className="inline-flex items-center gap-1 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <ChevronLeft className="size-4" />
-              <span>Anterior</span>
-            </button>
-
-            <span className="px-3 text-xs font-semibold text-zinc-700">
-              Página {page} de {totalPages}
-            </span>
-
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages || loading}
-              className="inline-flex items-center gap-1 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <span>Próxima</span>
-              <ChevronRight className="size-4" />
-            </button>
-          </div>
-        </div>
       )}
 
       {/* Modal de Detalhes da Auditoria */}

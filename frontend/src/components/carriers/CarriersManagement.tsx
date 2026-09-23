@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, Building, CheckCircle2, Clock, DollarSign, Edit2, Mail, Phone, Plus, Power, Search, Trash2, Truck } from 'lucide-react';
+import { AlertCircle, Building, CheckCircle2, Clock, DollarSign, Edit2, Mail, Phone, Plus, Power, Search, Trash2, Truck, Upload } from 'lucide-react';
 import { carriersService } from '@/src/services/carriers';
 import { Carrier, CreateCarrierInput, UpdateCarrierInput } from '@/src/types';
 import { CarrierModal, formatCNPJorCPF } from './CarrierModal';
+import { CarrierImportModal } from './CarrierImportModal';
 import { DeleteConfirmModal } from '../common/DeleteConfirmModal';
 
 export function CarriersManagement() {
@@ -15,6 +16,7 @@ export function CarriersManagement() {
 
   // Modais
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedCarrier, setSelectedCarrier] = useState<Carrier | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
@@ -191,13 +193,23 @@ export function CarriersManagement() {
           </p>
         </div>
 
-        <button
-          onClick={handleOpenNew}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-zinc-800 cursor-pointer"
-        >
-          <Plus className="size-4 text-amber-400" />
-          <span>Nova Transportadora</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setIsImportModalOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 shadow-xs transition hover:bg-zinc-50 cursor-pointer"
+          >
+            <Upload className="size-4 text-amber-500" />
+            <span>Importar CSV</span>
+          </button>
+          <button
+            onClick={handleOpenNew}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-zinc-800 cursor-pointer"
+          >
+            <Plus className="size-4 text-amber-400" />
+            <span>Nova Transportadora</span>
+          </button>
+        </div>
       </div>
 
       {/* Métricas Rápidas */}
@@ -475,6 +487,16 @@ export function CarriersManagement() {
           setCarrierToDelete(null);
         }}
         onConfirm={handleConfirmDelete}
+      />
+
+      {/* Modal de Importação CSV */}
+      <CarrierImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={() => {
+          loadCarriers();
+          showNotification('success', 'Base de transportadoras atualizada com sucesso!');
+        }}
       />
     </div>
   );

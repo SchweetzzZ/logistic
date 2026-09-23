@@ -25,3 +25,9 @@ export interface CreateCarrierInput {
 }
 
 export interface UpdateCarrierInput extends Partial<CreateCarrierInput> {}
+
+export interface CarrierImportResult {
+  totalProcessed: number;
+  totalImported: number;
+  errors: { row: number; error: string }[];
+}

@@ -50,3 +50,6 @@ Thumbs.db
 # Docker & temp
 .temp/
 .tmp/
+
+# Data and CSV files
+*.csv

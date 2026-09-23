@@ -132,16 +132,22 @@ export const dashboardService = {
       const countsByDay: Record<string, number> = {};
       for (const item of historyRes.data) {
         if (item.createdAt) {
-          const dateKey = item.createdAt.slice(0, 10);
+          // Normaliza a data para formato YYYY-MM-DD
+          const raw = String(item.createdAt);
+          const match = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+          const dateKey = match ? match[1] : raw.slice(0, 10);
           countsByDay[dateKey] = (countsByDay[dateKey] || 0) + 1;
         }
       }
 
-      // Constrói janela de 7 dias terminando na data atual
+      // Constrói janela de 7 dias terminando na data atual no fuso horário local
+      const now = new Date();
       const last7DaysKeys = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - (6 - i));
-        return d.toISOString().slice(0, 10);
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (6 - i));
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
       });
 
       const hasQuotesInLast7Days = last7DaysKeys.some(
@@ -159,7 +165,7 @@ export const dashboardService = {
           };
         });
       } else {
-        // Usa as datas reais do histórico em ordem cronológica
+        // Usa as datas reais do histórico em ordem cronológica se não houver nos últimos 7 dias
         const sortedDates = Object.keys(countsByDay).sort();
         const displayDates = sortedDates.slice(-7);
         chartSeries = displayDates.map((dateStr) => {

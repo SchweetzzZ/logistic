@@ -7,6 +7,9 @@ import {
   Body,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -14,13 +17,17 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiCreatedResponse,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { carrierService } from './carrier.service';
 import {
   CreateCarrierDto,
   UpdateCarrierDto,
   CarrierResponseDto,
   CarrierMessageResponseDto,
+  CarrierImportResponseDto,
 } from './dto/carrier-dto';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -35,6 +42,43 @@ import { PermissionsGuard } from '../common/guards/permissions.guard';
 @Controller('carriers')
 export class carrierController {
   constructor(private readonly carrierService: carrierService) {}
+
+  @Post('import')
+  @RequirePermission(PERMISSIONS.carriers.import)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Importar transportadoras em massa via arquivo CSV' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Arquivo CSV com os dados das transportadoras',
+        },
+      },
+    },
+  })
+  @ApiOkResponse({
+    type: CarrierImportResponseDto,
+    description: 'Resultado da importação em lote com contadores e erros',
+  })
+  async importCsv(
+    @CurrentTenant() tenantId: string,
+    @CurrentUser('userId') userId: string,
+    @UploadedFile() file?: Express.Multer.File,
+  ): Promise<CarrierImportResponseDto> {
+    if (!file || !file.buffer) {
+      throw new BadRequestException('Nenhum arquivo CSV foi enviado.');
+    }
+    return this.carrierService.importCsv(
+      tenantId,
+      file.buffer,
+      userId,
+      file.originalname,
+    );
+  }
 
   @Post()
   @RequirePermission(PERMISSIONS.carriers.create)

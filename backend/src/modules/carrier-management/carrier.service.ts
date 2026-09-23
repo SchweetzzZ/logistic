@@ -1,27 +1,19 @@
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { DRIZZLE, type DrizzleDB } from '../database/database.module';
 import { CreateCarrierDto, UpdateCarrierDto } from './dto/carrier-dto';
 import { and, eq, desc } from 'drizzle-orm';
 import { carrierSchema, type Carrier } from './schemas/schema';
 import { AuditService } from '../audit/audit.service';
+import { insertInBatches } from '../common/csv/csv-parser.util';
+import type { CsvImportResult } from '../common/csv/csv-import.types';
+import { parseCarriersCsv } from './carrier-csv.importer';
 
 @Injectable()
 export class carrierService {
-  constructor(
-    @Inject(DRIZZLE) private readonly db: DrizzleDB,
-    private readonly auditService: AuditService,
-  ) {}
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB,
+    private readonly auditService: AuditService) { }
 
-  async create(
-    tenantId: string,
-    data: CreateCarrierDto,
-    userId?: string,
-  ): Promise<Carrier> {
+  async create(tenantId: string, data: CreateCarrierDto, userId?: string): Promise<Carrier> {
     try {
       await this.db.insert(carrierSchema).values({
         ...data,
@@ -67,12 +59,7 @@ export class carrierService {
     }
   }
 
-  async update(
-    tenantId: string,
-    id: string,
-    data: UpdateCarrierDto,
-    userId?: string,
-  ): Promise<Carrier> {
+  async update(tenantId: string, id: string, data: UpdateCarrierDto, userId?: string): Promise<Carrier> {
     const current = await this.findById(tenantId, id);
 
     const diff: Record<string, { from: any; to: any }> = {};
@@ -131,12 +118,7 @@ export class carrierService {
     }
 
     try {
-      await this.db
-        .update(carrierSchema)
-        .set(updatePayload)
-        .where(
-          and(eq(carrierSchema.id, id), eq(carrierSchema.tenantId, tenantId)),
-        );
+      await this.db.update(carrierSchema).set(updatePayload).where(and(eq(carrierSchema.id, id), eq(carrierSchema.tenantId, tenantId)),);
 
       const updated = await this.findById(tenantId, id);
 
@@ -188,21 +170,11 @@ export class carrierService {
   }
 
   async findAll(tenantId: string) {
-    return this.db
-      .select()
-      .from(carrierSchema)
-      .where(eq(carrierSchema.tenantId, tenantId))
-      .orderBy(desc(carrierSchema.createdAt));
+    return this.db.select().from(carrierSchema).where(eq(carrierSchema.tenantId, tenantId)).orderBy(desc(carrierSchema.createdAt));
   }
 
   async findById(tenantId: string, id: string): Promise<Carrier> {
-    const [carrier] = await this.db
-      .select()
-      .from(carrierSchema)
-      .where(
-        and(eq(carrierSchema.id, id), eq(carrierSchema.tenantId, tenantId)),
-      )
-      .limit(1);
+    const [carrier] = await this.db.select().from(carrierSchema).where(and(eq(carrierSchema.id, id), eq(carrierSchema.tenantId, tenantId))).limit(1);
 
     if (!carrier) {
       throw new NotFoundException(
@@ -211,5 +183,56 @@ export class carrierService {
     }
 
     return carrier;
+  }
+
+  // Importa transportadoras em lote a partir de arquivo CSV
+  async importCsv(tenantId: string, fileBuffer: Buffer, userId?: string, originalFilename?: string,): Promise<CsvImportResult> {
+    const existingRecords = await this.db
+      .select({
+        name: carrierSchema.name,
+        document: carrierSchema.document,
+      })
+      .from(carrierSchema)
+      .where(eq(carrierSchema.tenantId, tenantId));
+
+    const existingDocs = new Set(
+      existingRecords.map((r) => r.document.replace(/\D/g, '')),
+    );
+    const existingNames = new Set(
+      existingRecords.map((r) => r.name.toLowerCase().trim()),
+    );
+
+    const { rows, totalProcessed, totalImported, errors } = parseCarriersCsv(
+      fileBuffer,
+      tenantId,
+      existingDocs,
+      existingNames,
+    );
+
+    if (rows.length > 0) {
+      await insertInBatches(
+        (batch) => this.db.insert(carrierSchema).values(batch),
+        rows,
+      );
+
+      await this.auditService.log({
+        tenantId,
+        userId: userId ?? null,
+        action: 'CARRIER_CREATE',
+        resource: 'carrier',
+        resourceId: 'batch-import',
+        details: {
+          importedCount: totalImported,
+          totalProcessed,
+          fileName: originalFilename || 'transportadoras.csv',
+        },
+      });
+    }
+
+    return {
+      totalProcessed,
+      totalImported,
+      errors,
+    };
   }
 }

@@ -50,3 +50,18 @@ export const carrierMessageResponseSchema = z.object({
 export class CarrierMessageResponseDto extends createZodDto(
   carrierMessageResponseSchema,
 ) { }
+
+export const carrierImportErrorSchema = z.object({
+  row: z.number(),
+  error: z.string(),
+});
+
+export const carrierImportResponseSchema = z.object({
+  totalProcessed: z.number(),
+  totalImported: z.number(),
+  errors: z.array(carrierImportErrorSchema),
+});
+
+export class CarrierImportResponseDto extends createZodDto(
+  carrierImportResponseSchema,
+) { }

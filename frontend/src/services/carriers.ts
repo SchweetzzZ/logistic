@@ -1,5 +1,6 @@
 import { rawClient } from './api';
-import type { Carrier, CreateCarrierInput, UpdateCarrierInput } from '@/src/types';
+import type { Carrier, CreateCarrierInput, UpdateCarrierInput, CarrierImportResult } from '@/src/types';
+import { API_BASE_URL } from '@/src/config/api.config';
 
 export const carriersService = {
   list: async (): Promise<Carrier[]> => {
@@ -73,5 +74,48 @@ export const carriersService = {
       return { success: false, error: msg };
     }
     return { success: true };
+  },
+
+  // Importa lista de transportadoras via upload de arquivo CSV
+  importCsv: async (
+    file: File,
+  ): Promise<{ data?: CarrierImportResult; error?: string }> => {
+    try {
+      const baseUrl = API_BASE_URL;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const headers: Record<string, string> = {};
+      if (typeof window !== 'undefined') {
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+
+      const response = await fetch(`${baseUrl}/carriers/import`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+        headers,
+      });
+
+      const json = await response.json();
+
+      if (!response.ok) {
+        let msg = 'Falha ao importar transportadoras.';
+        if (json && typeof json === 'object' && 'message' in json) {
+          const m = (json as { message?: unknown }).message;
+          msg = Array.isArray(m) ? m.join(', ') : String(m);
+        }
+        return { error: msg };
+      }
+
+      return { data: json };
+    } catch {
+      return {
+        error: 'Erro de conexão com o servidor ao importar o arquivo CSV.',
+      };
+    }
   },
 };

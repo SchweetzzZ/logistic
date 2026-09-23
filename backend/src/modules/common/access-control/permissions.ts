@@ -6,6 +6,7 @@ export const PERMISSIONS = {
     create: 'carriers:create',
     update: 'carriers:update',
     delete: 'carriers:delete',
+    import: 'carriers:import',
   },
   customers: {
     read: 'customers:read',
@@ -44,6 +45,7 @@ export const PERMISSIONS = {
     CREATE: 'carriers:create',
     UPDATE: 'carriers:update',
     DELETE: 'carriers:delete',
+    IMPORT: 'carriers:import',
   },
   CUSTOMERS: {
     READ: 'customers:read',
@@ -83,6 +85,7 @@ export type PermissionKey =
   | 'carriers:create'
   | 'carriers:update'
   | 'carriers:delete'
+  | 'carriers:import'
   | 'customers:read'
   | 'customers:create'
   | 'customers:update'
@@ -109,6 +112,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly PermissionKey[]> = {
     PERMISSIONS.carriers.create,
     PERMISSIONS.carriers.update,
     PERMISSIONS.carriers.delete,
+    PERMISSIONS.carriers.import,
     PERMISSIONS.customers.read,
     PERMISSIONS.customers.create,
     PERMISSIONS.customers.update,
@@ -134,6 +138,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly PermissionKey[]> = {
     PERMISSIONS.carriers.create,
     PERMISSIONS.carriers.update,
     PERMISSIONS.carriers.delete,
+    PERMISSIONS.carriers.import,
     PERMISSIONS.customers.read,
     PERMISSIONS.customers.create,
     PERMISSIONS.customers.update,
@@ -152,6 +157,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly PermissionKey[]> = {
   ],
   [Role.OPERATOR]: [
     PERMISSIONS.carriers.read,
+    PERMISSIONS.carriers.import,
     PERMISSIONS.customers.read,
     PERMISSIONS.customers.create,
     PERMISSIONS.customers.update,
