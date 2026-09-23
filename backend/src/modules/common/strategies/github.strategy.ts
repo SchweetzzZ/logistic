@@ -12,9 +12,9 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     authConfiguration: ConfigType<typeof authConfig>,
   ) {
     super({
-      clientID: authConfiguration.github.clientId,
-      clientSecret: authConfiguration.github.clientSecret,
-      callbackURL: authConfiguration.github.callbackUrl,
+      clientID: authConfiguration.github.clientId || '',
+      clientSecret: authConfiguration.github.clientSecret || '',
+      callbackURL: authConfiguration.github.callbackUrl || '',
       scope: ['user:email'],
     });
   }

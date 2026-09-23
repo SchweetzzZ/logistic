@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
-
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { TenantModule } from '../tenant/tenant.module';
 import { CommonModule } from '../common/common.module';
+import { AuditModule } from '../audit/audit.module';
+
 @Module({
-  imports: [ConfigModule, TenantModule, CommonModule, JwtModule.register({})],
+  imports: [CommonModule, AuditModule],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],
