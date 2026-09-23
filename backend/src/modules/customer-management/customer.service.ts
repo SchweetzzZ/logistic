@@ -1,16 +1,8 @@
-import {
-  Injectable,
-  Inject,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Inject, ConflictException, NotFoundException, } from '@nestjs/common';
 import { eq, and, ne, desc, like, or } from 'drizzle-orm';
 import { DRIZZLE, type DrizzleDB } from '../database/database.module';
 import { customers, Customer } from './schema/schema';
-import {
-  CreateCustomerDto,
-  UpdateCustomerDto,
-} from './dto/customer-manegement-dto';
+import { CreateCustomerDto, UpdateCustomerDto, } from './dto/customer-manegement-dto';
 import { AuditService } from '../audit/audit.service';
 
 @Injectable()
@@ -18,35 +10,21 @@ export class CustomerManagementService {
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDB,
     private readonly auditService: AuditService,
-  ) {}
+  ) { }
 
-  async create(
-    tenantId: string,
-    dto: CreateCustomerDto,
-    userId?: string,
-  ): Promise<Customer> {
-    const [existing] = await this.db
-      .select()
-      .from(customers)
-      .where(and(eq(customers.tenantId, tenantId), eq(customers.cpf, dto.cpf)))
-      .limit(1);
+  async create(tenantId: string, dto: CreateCustomerDto, userId?: string): Promise<Customer> {
+    const [existing] = await this.db.select().from(customers).where
+      (and(eq(customers.tenantId, tenantId), eq(customers.cpf, dto.cpf))).limit(1);
 
     if (existing) {
-      throw new ConflictException(
-        'Já existe um cliente cadastrado com este CPF nesta empresa',
-      );
+      throw new ConflictException('Já existe um cliente cadastrado com este CPF nesta empresa');
     }
 
-    await this.db.insert(customers).values({
-      ...dto,
-      tenantId,
-    });
+    await this.db.insert(customers).values
+      ({ ...dto, tenantId, });
 
-    const [created] = await this.db
-      .select()
-      .from(customers)
-      .where(and(eq(customers.tenantId, tenantId), eq(customers.cpf, dto.cpf)))
-      .limit(1);
+    const [created] = await this.db.select().from(customers).where
+      (and(eq(customers.tenantId, tenantId), eq(customers.cpf, dto.cpf))).limit(1);
 
     await this.auditService.log({
       tenantId,
@@ -69,10 +47,10 @@ export class CustomerManagementService {
   async findAll(tenantId: string, search?: string): Promise<Customer[]> {
     const searchFilter = search?.trim()
       ? or(
-          like(customers.name, `%${search.trim()}%`),
-          like(customers.cpf, `%${search.trim()}%`),
-          like(customers.email, `%${search.trim()}%`),
-        )
+        like(customers.name, `%${search.trim()}%`),
+        like(customers.cpf, `%${search.trim()}%`),
+        like(customers.email, `%${search.trim()}%`),
+      )
       : undefined;
 
     const whereClause = searchFilter

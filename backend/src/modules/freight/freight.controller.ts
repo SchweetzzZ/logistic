@@ -14,20 +14,20 @@ import {
 } from './dto/freight.dto';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../common/enums/role.enum';
+import { RequirePermission } from '../common/decorators/permissions.decorator';
+import { PERMISSIONS } from '../common/access-control/permissions';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
+import { PermissionsGuard } from '../common/guards/permissions.guard';
 
 @ApiTags('Freight')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('freight')
 export class FreightController {
   constructor(private readonly freightService: FreightService) {}
 
   @Post('simulate')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.freight.simulate)
   @ApiOperation({
     summary: 'Simular frete considerando peso, cubagem, distância e seguro',
     description:
@@ -46,7 +46,7 @@ export class FreightController {
   }
 
   @Get('history')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.freight.read)
   @ApiOperation({
     summary: 'Listar histórico de simulações de frete realizadas na empresa',
   })

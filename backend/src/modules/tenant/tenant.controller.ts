@@ -8,19 +8,20 @@ import {
 import { TenantService } from './tenant.service';
 import { TenantResponseDto, UpdateTenantDto } from './dto/tenant.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../common/enums/role.enum';
+import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { RequirePermission } from '../common/decorators/permissions.decorator';
+import { PERMISSIONS } from '../common/access-control/permissions';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 
 @ApiTags('Tenants')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('tenant')
 export class TenantController {
   constructor(private readonly tenantService: TenantService) {}
 
   @Get('current')
+  @RequirePermission(PERMISSIONS.tenants.read)
   @ApiOperation({ summary: 'Obter dados da empresa (tenant) da sessão atual' })
   @ApiOkResponse({
     type: TenantResponseDto,
@@ -33,7 +34,7 @@ export class TenantController {
   }
 
   @Patch('current')
-  @Roles(Role.ADMIN)
+  @RequirePermission(PERMISSIONS.tenants.update)
   @ApiOperation({
     summary: 'Atualizar dados da empresa (exclusivo para Administradores)',
   })

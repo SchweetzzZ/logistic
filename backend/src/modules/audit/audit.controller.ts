@@ -12,20 +12,20 @@ import {
   AuditLogDetailResponseDto,
 } from './dto/audit.dto';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
-import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../common/enums/role.enum';
+import { RequirePermission } from '../common/decorators/permissions.decorator';
+import { PERMISSIONS } from '../common/access-control/permissions';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
+import { PermissionsGuard } from '../common/guards/permissions.guard';
 
 @ApiTags('Audit')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('audit')
 export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
   @Get()
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @RequirePermission(PERMISSIONS.audit.read)
   @ApiOperation({
     summary:
       'Listar registros de auditoria do sistema com filtros e paginação (ADMIN e MANAGER)',
@@ -43,7 +43,7 @@ export class AuditController {
   }
 
   @Get(':id')
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @RequirePermission(PERMISSIONS.audit.read)
   @ApiOperation({
     summary:
       'Buscar detalhes de um registro de auditoria por ID (ADMIN e MANAGER)',

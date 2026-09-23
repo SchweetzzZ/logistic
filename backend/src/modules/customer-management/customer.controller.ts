@@ -33,21 +33,21 @@ import {
   CustomerImportResponseDto,
 } from './dto/customer-manegement-dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../common/enums/role.enum';
+import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { RequirePermission } from '../common/decorators/permissions.decorator';
+import { PERMISSIONS } from '../common/access-control/permissions';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @ApiTags('Customers')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('customers')
 export class CustomerManagementController {
   constructor(private readonly customerService: CustomerManagementService) {}
 
   @Post('import')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.customers.import)
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Importar clientes em massa via arquivo CSV' })
   @ApiConsumes('multipart/form-data')
@@ -84,7 +84,7 @@ export class CustomerManagementController {
   }
 
   @Post()
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.customers.create)
   @ApiOperation({ summary: 'Cadastrar novo cliente na empresa atual' })
   @ApiCreatedResponse({
     type: CustomerResponseDto,
@@ -99,7 +99,7 @@ export class CustomerManagementController {
   }
 
   @Get()
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.customers.read)
   @ApiOperation({
     summary: 'Listar clientes da empresa atual (com busca opcional)',
   })
@@ -120,7 +120,7 @@ export class CustomerManagementController {
   }
 
   @Get(':id')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.customers.read)
   @ApiOperation({ summary: 'Buscar cliente por ID' })
   @ApiOkResponse({
     type: CustomerResponseDto,
@@ -134,7 +134,7 @@ export class CustomerManagementController {
   }
 
   @Patch(':id')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.customers.update)
   @ApiOperation({ summary: 'Atualizar dados de um cliente' })
   @ApiOkResponse({
     type: CustomerResponseDto,
@@ -150,7 +150,7 @@ export class CustomerManagementController {
   }
 
   @Delete(':id')
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @RequirePermission(PERMISSIONS.customers.delete)
   @ApiOperation({ summary: 'Remover um cliente (Restrito a ADMIN e MANAGER)' })
   @ApiOkResponse({
     type: MessageResponseDto,

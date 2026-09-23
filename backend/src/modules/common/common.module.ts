@@ -5,6 +5,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { GithubStrategy } from './strategies/github.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { PermissionsGuard } from './guards/permissions.guard';
 
 @Module({
   imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
@@ -14,6 +15,7 @@ import { RolesGuard } from './guards/roles.guard';
     GithubStrategy,
     JwtAuthGuard,
     RolesGuard,
+    PermissionsGuard,
   ],
   exports: [
     PassportModule,
@@ -22,6 +24,7 @@ import { RolesGuard } from './guards/roles.guard';
     GithubStrategy,
     JwtAuthGuard,
     RolesGuard,
+    PermissionsGuard,
   ],
 })
 export class CommonModule {}

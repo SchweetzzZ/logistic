@@ -24,20 +24,20 @@ import {
 } from './dto/carrier-dto';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '../common/enums/role.enum';
+import { RequirePermission } from '../common/decorators/permissions.decorator';
+import { PERMISSIONS } from '../common/access-control/permissions';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
+import { PermissionsGuard } from '../common/guards/permissions.guard';
 
 @ApiTags('Carriers')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('carriers')
 export class carrierController {
   constructor(private readonly carrierService: carrierService) {}
 
   @Post()
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @RequirePermission(PERMISSIONS.carriers.create)
   @ApiOperation({ summary: 'Cadastrar nova transportadora' })
   @ApiCreatedResponse({
     type: CarrierResponseDto,
@@ -52,7 +52,7 @@ export class carrierController {
   }
 
   @Patch(':id')
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @RequirePermission(PERMISSIONS.carriers.update)
   @ApiOperation({ summary: 'Atualizar transportadora' })
   @ApiOkResponse({
     type: CarrierResponseDto,
@@ -68,7 +68,7 @@ export class carrierController {
   }
 
   @Delete(':id')
-  @Roles(Role.ADMIN, Role.MANAGER)
+  @RequirePermission(PERMISSIONS.carriers.delete)
   @ApiOperation({ summary: 'Remover transportadora' })
   @ApiOkResponse({
     type: CarrierMessageResponseDto,
@@ -83,7 +83,7 @@ export class carrierController {
   }
 
   @Get()
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.carriers.read)
   @ApiOperation({ summary: 'Listar todas as transportadoras' })
   @ApiOkResponse({
     type: [CarrierResponseDto],
@@ -96,7 +96,7 @@ export class carrierController {
   }
 
   @Get(':id')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.carriers.read)
   @ApiOperation({ summary: 'Buscar transportadora por ID' })
   @ApiOkResponse({
     type: CarrierResponseDto,

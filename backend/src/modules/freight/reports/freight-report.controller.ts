@@ -25,10 +25,10 @@ import type { Response } from 'express';
 import * as fs from 'fs';
 import { CurrentTenant } from '../../common/decorators/current-tenant.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/enums/role.enum';
+import { RequirePermission } from '../../common/decorators/permissions.decorator';
+import { PERMISSIONS } from '../../common/access-control/permissions';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
+import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import {
   ExportFreightReportDto,
   ExportReportResponseDto,
@@ -37,7 +37,7 @@ import { REPORTS_STORAGE_DIR } from './reports.constants';
 
 @ApiTags('Freight Reports')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('freight/reports')
 export class FreightReportController {
   constructor(
@@ -47,7 +47,7 @@ export class FreightReportController {
 
   @Post('export')
   @HttpCode(HttpStatus.ACCEPTED)
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.reports.export)
   @ApiOperation({
     summary: 'Solicitar geração assíncrona de relatório de histórico de fretes',
     description:
@@ -85,7 +85,7 @@ export class FreightReportController {
   }
 
   @Get('download/:fileName')
-  @Roles(Role.ADMIN, Role.MANAGER, Role.OPERATOR)
+  @RequirePermission(PERMISSIONS.reports.read)
   @ApiOperation({
     summary: 'Fazer download de um relatório CSV gerado pelo worker',
   })

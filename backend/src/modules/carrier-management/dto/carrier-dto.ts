@@ -14,27 +14,17 @@ export const createCarrierSchema = z.object({
     .max(20, 'Documento inválido'),
   email: z.string().trim().email('E-mail inválido').optional().nullable(),
   phone: z.string().trim().max(20).optional().nullable(),
-  basePrice: z
-    .number()
-    .min(0, 'Taxa base deve ser maior ou igual a zero')
-    .default(0),
-  pricePerKg: z
-    .number()
-    .min(0, 'Preço por kg deve ser maior ou igual a zero')
-    .default(0),
-  deadlineDays: z
-    .number()
-    .int()
-    .min(1, 'Prazo deve ser de no mínimo 1 dia')
-    .default(3),
-  status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
+  basePrice: z.number().min(0, 'Taxa base deve ser maior ou igual a zero').optional().default(0),
+  pricePerKg: z.number().min(0, 'Preço por kg deve ser maior ou igual a zero').optional().default(0),
+  deadlineDays: z.number().int().min(1, 'Prazo deve ser de no mínimo 1 dia').optional().default(3),
+  status: z.enum(['ACTIVE', 'INACTIVE']).optional().default('ACTIVE'),
 });
 
-export class CreateCarrierDto extends createZodDto(createCarrierSchema) {}
+export class CreateCarrierDto extends createZodDto(createCarrierSchema) { }
 
 export const updateCarrierSchema = createCarrierSchema.partial();
 
-export class UpdateCarrierDto extends createZodDto(updateCarrierSchema) {}
+export class UpdateCarrierDto extends createZodDto(updateCarrierSchema) { }
 
 export const carrierResponseSchema = z.object({
   id: z.string(),
@@ -51,7 +41,7 @@ export const carrierResponseSchema = z.object({
   updatedAt: z.string(),
 });
 
-export class CarrierResponseDto extends createZodDto(carrierResponseSchema) {}
+export class CarrierResponseDto extends createZodDto(carrierResponseSchema) { }
 
 export const carrierMessageResponseSchema = z.object({
   message: z.string(),
@@ -59,4 +49,4 @@ export const carrierMessageResponseSchema = z.object({
 
 export class CarrierMessageResponseDto extends createZodDto(
   carrierMessageResponseSchema,
-) {}
+) { }
