@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
-    "start": "next start --port 3000",
+    "start": "next start",
     "lint": "tsc --noEmit",
-    "api:sync": "openapi-typescript http://localhost:3001/api/docs-json -o src/api/schema.d.ts"
+    "api:sync": "openapi-typescript http://localhost:3001/api/docs-json --default-non-nullable false -o src/api/schema.d.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
