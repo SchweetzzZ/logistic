@@ -1,5 +1,6 @@
 import { rawClient } from './api';
 import type { Customer, CreateCustomerInput, UpdateCustomerInput } from '@/src/types';
+import { API_BASE_URL } from '@/src/config/api.config';
 
 export const customersService = {
   list: async (search?: string): Promise<Customer[]> => {
@@ -28,12 +29,12 @@ export const customersService = {
 
   create: async (payload: CreateCustomerInput): Promise<{ data?: Customer; error?: string }> => {
     const { data, error } = await rawClient.POST('/customers', {
-      body: payload as any,
+      body: payload,
     });
     if (error) {
       let msg = 'Falha ao cadastrar cliente.';
       if (typeof error === 'object' && error !== null && 'message' in error) {
-        const m = (error as any).message;
+        const m = (error as { message?: unknown }).message;
         msg = Array.isArray(m) ? m.join(', ') : String(m);
       }
       return { error: msg };
@@ -49,12 +50,12 @@ export const customersService = {
       params: {
         path: { id },
       },
-      body: payload as any,
+      body: payload,
     });
     if (error) {
       let msg = 'Falha ao atualizar cliente.';
       if (typeof error === 'object' && error !== null && 'message' in error) {
-        const m = (error as any).message;
+        const m = (error as { message?: unknown }).message;
         msg = Array.isArray(m) ? m.join(', ') : String(m);
       }
       return { error: msg };
@@ -71,7 +72,7 @@ export const customersService = {
     if (error) {
       let msg = 'Falha ao excluir cliente.';
       if (typeof error === 'object' && error !== null && 'message' in error) {
-        const m = (error as any).message;
+        const m = (error as { message?: unknown }).message;
         msg = Array.isArray(m) ? m.join(', ') : String(m);
       }
       return { success: false, error: msg };
@@ -80,18 +81,9 @@ export const customersService = {
   },
 
   // Importa lista de clientes via upload de arquivo CSV
-  importCsv: async (
-    file: File,
-  ): Promise<{
-    data?: {
-      totalProcessed: number;
-      totalImported: number;
-      errors: { row: number; error: string }[];
-    };
-    error?: string;
-  }> => {
+  importCsv: async (file: File): Promise<{ data?: { totalProcessed: number; totalImported: number; errors: { row: number; error: string }[]; }; error?: string; }> => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const baseUrl = API_BASE_URL;
       const formData = new FormData();
       formData.append('file', file);
 
@@ -115,7 +107,7 @@ export const customersService = {
       if (!response.ok) {
         let msg = 'Falha ao importar clientes.';
         if (json && typeof json === 'object' && 'message' in json) {
-          const m = (json as any).message;
+          const m = (json as { message?: unknown }).message;
           msg = Array.isArray(m) ? m.join(', ') : String(m);
         }
         return { error: msg };

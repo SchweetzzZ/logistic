@@ -1,0 +1,2588 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Retorna mensagem de status da API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "Logistics SaaS API Enterprise is running!"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Healthcheck da API",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/audit": {
+      "get": {
+        "operationId": "AuditController_findAll",
+        "parameters": [
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "AUTH_LOGIN",
+                "AUTH_LOGOUT",
+                "USER_CREATE",
+                "USER_UPDATE",
+                "USER_ROLE_CHANGE",
+                "USER_DELETE",
+                "CARRIER_CREATE",
+                "CARRIER_UPDATE",
+                "CARRIER_DELETE",
+                "CUSTOMER_CREATE",
+                "CUSTOMER_UPDATE",
+                "CUSTOMER_DELETE"
+              ]
+            }
+          },
+          {
+            "name": "resource",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 9007199254740991,
+              "exclusiveMinimum": true,
+              "default": 1,
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "exclusiveMinimum": true,
+              "default": 20,
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de registros de auditoria com dados do usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogPaginatedResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar registros de auditoria do sistema com filtros e paginação (ADMIN e MANAGER)",
+        "tags": [
+          "Audit"
+        ]
+      }
+    },
+    "/audit/{id}": {
+      "get": {
+        "operationId": "AuditController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalhes do registro de auditoria",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLogDetailResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Buscar detalhes de um registro de auditoria por ID (ADMIN e MANAGER)",
+        "tags": [
+          "Audit"
+        ]
+      }
+    },
+    "/notifications/stream": {
+      "get": {
+        "description": "Mantém um canal HTTP persistente (EventSource) para notificar o frontend instantaneamente.",
+        "operationId": "NotificationController_stream",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Conexão em tempo real via Server-Sent Events (SSE)",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/tenant/current": {
+      "get": {
+        "operationId": "TenantController_getCurrentTenant",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Dados da empresa vinculada ao usuário logado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obter dados da empresa (tenant) da sessão atual",
+        "tags": [
+          "Tenants"
+        ]
+      },
+      "patch": {
+        "operationId": "TenantController_updateCurrentTenant",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTenantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Empresa atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Atualizar dados da empresa (exclusivo para Administradores)",
+        "tags": [
+          "Tenants"
+        ]
+      }
+    },
+    "/user/me": {
+      "get": {
+        "operationId": "UserController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Dados do perfil do usuário autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Obter dados do usuário da sessão atual",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/user": {
+      "post": {
+        "operationId": "UserController_createEmployee",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Colaborador cadastrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Criar novo colaborador na empresa atual (Restrito a ADMIN)",
+        "tags": [
+          "Users"
+        ]
+      },
+      "get": {
+        "operationId": "UserController_listUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de usuários do tenant atual",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar colaboradores da mesma empresa (ADMIN e MANAGER)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/user/{id}": {
+      "patch": {
+        "operationId": "UserController_updateEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Colaborador atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Atualizar dados de um colaborador (Restrito a ADMIN)",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "UserController_removeEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Colaborador removido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remover um colaborador da empresa (Restrito a ADMIN)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterTenantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Empresa e Administrador cadastrados com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Auto-cadastro: cria a Empresa (Tenant) e o usuário ADMIN",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login bem-sucedido com cookies emitidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Autenticar com email e senha (emite cookies HttpOnly e Bearer)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/google": {
+      "get": {
+        "operationId": "AuthController_googleAuth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Redireciona para autenticação com Google",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "operationId": "AuthController_googleCallback",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Callback da autenticação com Google",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/github": {
+      "get": {
+        "operationId": "AuthController_githubAuth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Redireciona para autenticação com GitHub",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/github/callback": {
+      "get": {
+        "operationId": "AuthController_githubCallback",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Callback da autenticação com GitHub",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/register-oauth": {
+      "post": {
+        "operationId": "AuthController_registerOAuth",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterOAuthTenantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Empresa e Administrador criados via OAuth com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Conclui o cadastro da empresa após login social (Google ou GitHub)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/refresh-token": {
+      "post": {
+        "operationId": "AuthController_refreshToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sessão renovada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Renovar Access Token via Refresh Token (cookie ou body)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Logout efetuado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Encerrar sessão, revogar refresh token e limpar cookies",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/customers/import": {
+      "post": {
+        "operationId": "CustomerManagementController_importCsv",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Arquivo CSV com os dados dos clientes"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado da importação em lote com contadores e erros",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerImportResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Importar clientes em massa via arquivo CSV",
+        "tags": [
+          "Customers"
+        ]
+      }
+    },
+    "/customers": {
+      "post": {
+        "operationId": "CustomerManagementController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCustomerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cliente cadastrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cadastrar novo cliente na empresa atual",
+        "tags": [
+          "Customers"
+        ]
+      },
+      "get": {
+        "operationId": "CustomerManagementController_findAll",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Filtrar por nome, CPF ou e-mail",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de clientes do tenant atual",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar clientes da empresa atual (com busca opcional)",
+        "tags": [
+          "Customers"
+        ]
+      }
+    },
+    "/customers/{id}": {
+      "get": {
+        "operationId": "CustomerManagementController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados detalhados do cliente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Buscar cliente por ID",
+        "tags": [
+          "Customers"
+        ]
+      },
+      "patch": {
+        "operationId": "CustomerManagementController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cliente atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Atualizar dados de um cliente",
+        "tags": [
+          "Customers"
+        ]
+      },
+      "delete": {
+        "operationId": "CustomerManagementController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cliente removido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remover um cliente (Restrito a ADMIN e MANAGER)",
+        "tags": [
+          "Customers"
+        ]
+      }
+    },
+    "/carriers": {
+      "post": {
+        "operationId": "carrierController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCarrierDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Transportadora cadastrada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarrierResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cadastrar nova transportadora",
+        "tags": [
+          "Carriers"
+        ]
+      },
+      "get": {
+        "operationId": "carrierController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lista de transportadoras da empresa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CarrierResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar todas as transportadoras",
+        "tags": [
+          "Carriers"
+        ]
+      }
+    },
+    "/carriers/{id}": {
+      "patch": {
+        "operationId": "carrierController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCarrierDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transportadora atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarrierResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Atualizar transportadora",
+        "tags": [
+          "Carriers"
+        ]
+      },
+      "delete": {
+        "operationId": "carrierController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transportadora removida com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarrierMessageResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remover transportadora",
+        "tags": [
+          "Carriers"
+        ]
+      },
+      "get": {
+        "operationId": "carrierController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados detalhados da transportadora",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarrierResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Buscar transportadora por ID",
+        "tags": [
+          "Carriers"
+        ]
+      }
+    },
+    "/freight/simulate": {
+      "post": {
+        "description": "Calcula cotações de frete comparando todas as transportadoras ativas da empresa e grava auditoria.",
+        "operationId": "FreightController_simulate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulateFreightDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cotações de frete calculadas com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulateFreightResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Simular frete considerando peso, cubagem, distância e seguro",
+        "tags": [
+          "Freight"
+        ]
+      }
+    },
+    "/freight/history": {
+      "get": {
+        "operationId": "FreightController_getHistory",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Histórico paginado de simulações de frete",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreightHistoryResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar histórico de simulações de frete realizadas na empresa",
+        "tags": [
+          "Freight"
+        ]
+      }
+    },
+    "/freight/reports/export": {
+      "post": {
+        "description": "Enfileira a exportação em background via BullMQ. O frontend será avisado via SSE assim que o arquivo estiver disponível.",
+        "operationId": "FreightReportController_exportReport",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportFreightReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "A geração do relatório foi enfileirada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportReportResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Solicitar geração assíncrona de relatório de histórico de fretes",
+        "tags": [
+          "Freight Reports"
+        ]
+      }
+    },
+    "/freight/reports/download/{fileName}": {
+      "get": {
+        "operationId": "FreightReportController_downloadFile",
+        "parameters": [
+          {
+            "name": "fileName",
+            "required": true,
+            "in": "path",
+            "description": "Nome do arquivo retornado na notificação",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Arquivo CSV para download",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fazer download de um relatório CSV gerado pelo worker",
+        "tags": [
+          "Freight Reports"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "API",
+    "description": "",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "AuditLogPaginatedResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "tenantId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "userId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "userName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "userEmail": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "AUTH_LOGIN",
+                    "AUTH_LOGOUT",
+                    "USER_CREATE",
+                    "USER_UPDATE",
+                    "USER_ROLE_CHANGE",
+                    "USER_DELETE",
+                    "CARRIER_CREATE",
+                    "CARRIER_UPDATE",
+                    "CARRIER_DELETE",
+                    "CUSTOMER_CREATE",
+                    "CUSTOMER_UPDATE",
+                    "CUSTOMER_DELETE"
+                  ]
+                },
+                "resource": {
+                  "type": "string"
+                },
+                "resourceId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "ipAddress": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "userAgent": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "details": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {},
+                  "nullable": true
+                },
+                "createdAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "action",
+                "resource",
+                "createdAt"
+              ]
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "limit",
+          "totalPages"
+        ]
+      },
+      "AuditLogDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "userId": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "AUTH_LOGIN",
+              "AUTH_LOGOUT",
+              "USER_CREATE",
+              "USER_UPDATE",
+              "USER_ROLE_CHANGE",
+              "USER_DELETE",
+              "CARRIER_CREATE",
+              "CARRIER_UPDATE",
+              "CARRIER_DELETE",
+              "CUSTOMER_CREATE",
+              "CUSTOMER_UPDATE",
+              "CUSTOMER_DELETE"
+            ]
+          },
+          "resource": {
+            "type": "string"
+          },
+          "resourceId": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ipAddress": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "userAgent": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "details": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {},
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "resource",
+          "createdAt"
+        ]
+      },
+      "TenantResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "document": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "document",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateTenantDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "document": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 20,
+            "pattern": "^[a-zA-Z0-9.\\-/]+$"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "SUSPENDED"
+            ]
+          }
+        }
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "authProvider": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "role",
+          "tenantId"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6
+          },
+          "role": {
+            "default": "OPERATOR",
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MANAGER",
+              "OPERATOR"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MANAGER",
+              "OPERATOR"
+            ]
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6
+          }
+        }
+      },
+      "MessageResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "RegisterTenantDto": {
+        "type": "object",
+        "properties": {
+          "companyName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "document": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 20,
+            "pattern": "^[a-zA-Z0-9.\\-/]+$"
+          },
+          "adminName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6
+          }
+        },
+        "required": [
+          "companyName",
+          "document",
+          "adminName",
+          "email",
+          "password"
+        ]
+      },
+      "AuthResponseDto": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "tenantId": {
+                "type": "string"
+              },
+              "authProvider": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "email",
+              "role",
+              "tenantId"
+            ]
+          },
+          "accessToken": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RegisterOAuthTenantDto": {
+        "type": "object",
+        "properties": {
+          "onboardingToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "companyName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "document": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 20,
+            "pattern": "^[a-zA-Z0-9.\\-/]+$"
+          }
+        },
+        "required": [
+          "onboardingToken",
+          "companyName",
+          "document"
+        ]
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomerImportResponseDto": {
+        "type": "object",
+        "properties": {
+          "totalProcessed": {
+            "type": "number"
+          },
+          "totalImported": {
+            "type": "number"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "row": {
+                  "type": "number"
+                },
+                "error": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "row",
+                "error"
+              ]
+            }
+          }
+        },
+        "required": [
+          "totalProcessed",
+          "totalImported",
+          "errors"
+        ]
+      },
+      "CreateCustomerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "cpf": {
+            "type": "string",
+            "minLength": 11,
+            "maxLength": 14,
+            "pattern": "^[0-9.-]+$"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 100,
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 20,
+            "nullable": true
+          },
+          "zipCode": {
+            "type": "string",
+            "maxLength": 9,
+            "nullable": true
+          },
+          "street": {
+            "type": "string",
+            "maxLength": 150,
+            "nullable": true
+          },
+          "number": {
+            "type": "string",
+            "maxLength": 20,
+            "nullable": true
+          },
+          "complement": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "maxLength": 20,
+            "nullable": true
+          }
+        },
+        "required": [
+          "name",
+          "cpf"
+        ]
+      },
+      "CustomerResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cpf": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "zipCode": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "street": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "number": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "complement": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "city": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "state": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "cpf",
+          "tenantId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateCustomerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "cpf": {
+            "type": "string",
+            "minLength": 11,
+            "maxLength": 14,
+            "pattern": "^[0-9.-]+$"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 100,
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 20,
+            "nullable": true
+          },
+          "zipCode": {
+            "type": "string",
+            "maxLength": 9,
+            "nullable": true
+          },
+          "street": {
+            "type": "string",
+            "maxLength": 150,
+            "nullable": true
+          },
+          "number": {
+            "type": "string",
+            "maxLength": 20,
+            "nullable": true
+          },
+          "complement": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "maxLength": 20,
+            "nullable": true
+          }
+        }
+      },
+      "CreateCarrierDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "document": {
+            "type": "string",
+            "minLength": 11,
+            "maxLength": 20
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 20,
+            "nullable": true
+          },
+          "basePrice": {
+            "default": 0,
+            "type": "number",
+            "minimum": 0
+          },
+          "pricePerKg": {
+            "default": 0,
+            "type": "number",
+            "minimum": 0
+          },
+          "deadlineDays": {
+            "default": 3,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "status": {
+            "default": "ACTIVE",
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "document"
+        ]
+      },
+      "CarrierResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "document": {
+            "type": "string"
+          },
+          "email": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "phone": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "basePrice": {
+            "type": "string"
+          },
+          "pricePerKg": {
+            "type": "string"
+          },
+          "deadlineDays": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tenantId",
+          "name",
+          "document",
+          "basePrice",
+          "pricePerKg",
+          "deadlineDays",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateCarrierDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "document": {
+            "type": "string",
+            "minLength": 11,
+            "maxLength": 20
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 20,
+            "nullable": true
+          },
+          "basePrice": {
+            "default": 0,
+            "type": "number",
+            "minimum": 0
+          },
+          "pricePerKg": {
+            "default": 0,
+            "type": "number",
+            "minimum": 0
+          },
+          "deadlineDays": {
+            "default": 3,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "status": {
+            "default": "ACTIVE",
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          }
+        }
+      },
+      "CarrierMessageResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "SimulateFreightDto": {
+        "type": "object",
+        "properties": {
+          "destinationZipCode": {
+            "type": "string"
+          },
+          "originZipCode": {
+            "type": "string"
+          },
+          "weight": {
+            "type": "number",
+            "exclusiveMinimum": true,
+            "minimum": 0
+          },
+          "dimensions": {
+            "type": "object",
+            "properties": {
+              "length": {
+                "type": "number",
+                "exclusiveMinimum": true,
+                "minimum": 0
+              },
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": true,
+                "minimum": 0
+              },
+              "height": {
+                "type": "number",
+                "exclusiveMinimum": true,
+                "minimum": 0
+              }
+            },
+            "required": [
+              "length",
+              "width",
+              "height"
+            ]
+          },
+          "declaredValue": {
+            "type": "number",
+            "minimum": 0
+          },
+          "carrierId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "required": [
+          "destinationZipCode",
+          "weight",
+          "dimensions",
+          "declaredValue"
+        ]
+      },
+      "SimulateFreightResponseDto": {
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "object",
+            "properties": {
+              "zipCode": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "isEstimated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "zipCode",
+              "city",
+              "state"
+            ]
+          },
+          "destination": {
+            "type": "object",
+            "properties": {
+              "zipCode": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "isEstimated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "zipCode",
+              "city",
+              "state"
+            ]
+          },
+          "package": {
+            "type": "object",
+            "properties": {
+              "actualWeightKg": {
+                "type": "number"
+              },
+              "volumetricWeightKg": {
+                "type": "number"
+              },
+              "chargedWeightKg": {
+                "type": "number"
+              },
+              "declaredValue": {
+                "type": "number"
+              },
+              "dimensions": {
+                "type": "object",
+                "properties": {
+                  "length": {
+                    "type": "number",
+                    "exclusiveMinimum": true,
+                    "minimum": 0
+                  },
+                  "width": {
+                    "type": "number",
+                    "exclusiveMinimum": true,
+                    "minimum": 0
+                  },
+                  "height": {
+                    "type": "number",
+                    "exclusiveMinimum": true,
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "length",
+                  "width",
+                  "height"
+                ]
+              }
+            },
+            "required": [
+              "actualWeightKg",
+              "volumetricWeightKg",
+              "chargedWeightKg",
+              "declaredValue",
+              "dimensions"
+            ]
+          },
+          "deliveryType": {
+            "type": "string",
+            "enum": [
+              "LOCAL",
+              "STATE",
+              "INTERSTATE"
+            ]
+          },
+          "quotes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "carrierId": {
+                  "type": "string"
+                },
+                "carrierName": {
+                  "type": "string"
+                },
+                "deadlineDays": {
+                  "type": "number"
+                },
+                "breakdown": {
+                  "type": "object",
+                  "properties": {
+                    "basePrice": {
+                      "type": "number"
+                    },
+                    "pricePerKg": {
+                      "type": "number"
+                    },
+                    "chargedWeightKg": {
+                      "type": "number"
+                    },
+                    "weightCost": {
+                      "type": "number"
+                    },
+                    "distanceMultiplier": {
+                      "type": "number"
+                    },
+                    "shippingSubtotal": {
+                      "type": "number"
+                    },
+                    "insuranceCost": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "basePrice",
+                    "pricePerKg",
+                    "chargedWeightKg",
+                    "weightCost",
+                    "distanceMultiplier",
+                    "shippingSubtotal",
+                    "insuranceCost"
+                  ]
+                },
+                "totalPrice": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "carrierId",
+                "carrierName",
+                "deadlineDays",
+                "breakdown",
+                "totalPrice"
+              ]
+            }
+          }
+        },
+        "required": [
+          "origin",
+          "destination",
+          "package",
+          "deliveryType",
+          "quotes"
+        ]
+      },
+      "FreightHistoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "tenantId": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "originZipCode": {
+                  "type": "string"
+                },
+                "destinationZipCode": {
+                  "type": "string"
+                },
+                "originCity": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "originState": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "destinationCity": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "destinationState": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "actualWeightKg": {
+                  "type": "string"
+                },
+                "volumetricWeightKg": {
+                  "type": "string"
+                },
+                "chargedWeightKg": {
+                  "type": "string"
+                },
+                "declaredValue": {
+                  "type": "string"
+                },
+                "dimensionsLength": {
+                  "type": "string"
+                },
+                "dimensionsWidth": {
+                  "type": "string"
+                },
+                "dimensionsHeight": {
+                  "type": "string"
+                },
+                "deliveryType": {
+                  "type": "string",
+                  "enum": [
+                    "LOCAL",
+                    "STATE",
+                    "INTERSTATE"
+                  ]
+                },
+                "cheapestCarrierId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "cheapestCarrierName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "cheapestPrice": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "cheapestDeadlineDays": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "quotes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "carrierId": {
+                        "type": "string"
+                      },
+                      "carrierName": {
+                        "type": "string"
+                      },
+                      "deadlineDays": {
+                        "type": "number"
+                      },
+                      "breakdown": {
+                        "type": "object",
+                        "properties": {
+                          "basePrice": {
+                            "type": "number"
+                          },
+                          "pricePerKg": {
+                            "type": "number"
+                          },
+                          "chargedWeightKg": {
+                            "type": "number"
+                          },
+                          "weightCost": {
+                            "type": "number"
+                          },
+                          "distanceMultiplier": {
+                            "type": "number"
+                          },
+                          "shippingSubtotal": {
+                            "type": "number"
+                          },
+                          "insuranceCost": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "basePrice",
+                          "pricePerKg",
+                          "chargedWeightKg",
+                          "weightCost",
+                          "distanceMultiplier",
+                          "shippingSubtotal",
+                          "insuranceCost"
+                        ]
+                      },
+                      "totalPrice": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "carrierId",
+                      "carrierName",
+                      "deadlineDays",
+                      "breakdown",
+                      "totalPrice"
+                    ]
+                  }
+                },
+                "createdAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "tenantId",
+                "userId",
+                "originZipCode",
+                "destinationZipCode",
+                "originCity",
+                "originState",
+                "destinationCity",
+                "destinationState",
+                "actualWeightKg",
+                "volumetricWeightKg",
+                "chargedWeightKg",
+                "declaredValue",
+                "dimensionsLength",
+                "dimensionsWidth",
+                "dimensionsHeight",
+                "deliveryType",
+                "cheapestCarrierId",
+                "cheapestCarrierName",
+                "cheapestPrice",
+                "cheapestDeadlineDays",
+                "quotes",
+                "createdAt"
+              ]
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "limit",
+          "totalPages"
+        ]
+      },
+      "ExportFreightReportDto": {
+        "type": "object",
+        "properties": {
+          "format": {
+            "default": "csv",
+            "type": "string",
+            "enum": [
+              "csv"
+            ]
+          },
+          "startDate": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
+          },
+          "limit": {
+            "default": 1000,
+            "type": "integer",
+            "exclusiveMinimum": true,
+            "maximum": 5000,
+            "minimum": 0
+          }
+        }
+      },
+      "ExportReportResponseDto": {
+        "type": "object",
+        "properties": {
+          "jobId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ]
+      }
+    }
+  }
+}

@@ -10,10 +10,9 @@ import React, {
 } from 'react';
 import type { RealtimeNotification } from '@/src/types/reports';
 import { reportsService } from '@/src/services/reports';
+import { API_BASE_URL } from '@/src/config/api.config';
 
 const STORAGE_KEY = 'logiflow_realtime_notifications';
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export type ConnectionStatus =
   | 'connecting'

@@ -2,17 +2,15 @@ import { rawClient } from './api';
 import type { SimulateFreightInput, SimulationResult, FreightHistoryResponse } from '@/src/types';
 
 export const freightService = {
-  simulate: async (
-    payload: SimulateFreightInput,
-  ): Promise<{ data?: SimulationResult; error?: string }> => {
+  simulate: async (payload: SimulateFreightInput): Promise<{ data?: SimulationResult; error?: string }> => {
     const { data, error } = await rawClient.POST('/freight/simulate', {
-      body: payload as any,
+      body: payload,
     });
 
     if (error) {
       let msg = 'Falha ao calcular cotação de frete.';
       if (typeof error === 'object' && error !== null && 'message' in error) {
-        const m = (error as any).message;
+        const m = (error as { message?: unknown }).message;
         msg = Array.isArray(m) ? m.join(', ') : String(m);
       }
       return { error: msg };
@@ -28,8 +26,8 @@ export const freightService = {
     const { data, error } = await rawClient.GET('/freight/history', {
       params: {
         query: {
-          page: String(page) as any,
-          limit: String(limit) as any,
+          page,
+          limit,
         },
       },
     });

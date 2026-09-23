@@ -93,74 +93,6 @@ export interface paths {
         patch: operations["TenantController_updateCurrentTenant"];
         trace?: never;
     };
-    "/user/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Auto-cadastro: cria a Empresa (Tenant) e o usuário ADMIN */
-        post: operations["UserController_register"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Autenticar com email e senha (emite cookies HttpOnly e Bearer) */
-        post: operations["UserController_login"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/refresh-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Renovar Access Token via Refresh Token (cookie ou body) */
-        post: operations["UserController_refreshToken"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Encerrar sessão, revogar refresh token e limpar cookies */
-        post: operations["UserController_logout"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/user/me": {
         parameters: {
             query?: never;
@@ -212,6 +144,176 @@ export interface paths {
         head?: never;
         /** Atualizar dados de um colaborador (Restrito a ADMIN) */
         patch: operations["UserController_updateEmployee"];
+        trace?: never;
+    };
+    "/auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Auto-cadastro: cria a Empresa (Tenant) e o usuário ADMIN */
+        post: operations["AuthController_register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Autenticar com email e senha (emite cookies HttpOnly e Bearer) */
+        post: operations["AuthController_login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Redireciona para autenticação com Google */
+        get: operations["AuthController_googleAuth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/google/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Callback da autenticação com Google */
+        get: operations["AuthController_googleCallback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/github": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Redireciona para autenticação com GitHub */
+        get: operations["AuthController_githubAuth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/github/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Callback da autenticação com GitHub */
+        get: operations["AuthController_githubCallback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/register-oauth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Conclui o cadastro da empresa após login social (Google ou GitHub) */
+        post: operations["AuthController_registerOAuth"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/refresh-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Renovar Access Token via Refresh Token (cookie ou body) */
+        post: operations["AuthController_refreshToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Encerrar sessão, revogar refresh token e limpar cookies */
+        post: operations["AuthController_logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customers/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Importar clientes em massa via arquivo CSV */
+        post: operations["CustomerManagementController_importCsv"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/customers": {
@@ -418,43 +520,13 @@ export interface components {
             /** @enum {string} */
             status?: "ACTIVE" | "INACTIVE" | "SUSPENDED";
         };
-        RegisterTenantDto: {
-            companyName: string;
-            document: string;
-            adminName: string;
-            /** Format: email */
-            email: string;
-            password: string;
-        };
-        AuthResponseDto: {
-            user: {
-                id: string;
-                name: string;
-                email: string;
-                role: string;
-                tenantId: string;
-                createdAt?: string;
-                updatedAt?: string;
-            };
-            accessToken: string;
-        };
-        LoginDto: {
-            /** Format: email */
-            email: string;
-            password: string;
-        };
-        RefreshTokenDto: {
-            refreshToken?: string;
-        };
-        MessageResponseDto: {
-            message: string;
-        };
         UserResponseDto: {
             id: string;
             name: string;
             email: string;
             role: string;
             tenantId: string;
+            authProvider?: string;
             createdAt?: string;
             updatedAt?: string;
         };
@@ -467,7 +539,7 @@ export interface components {
              * @default OPERATOR
              * @enum {string}
              */
-            role: "ADMIN" | "MANAGER" | "OPERATOR";
+            role?: "ADMIN" | "MANAGER" | "OPERATOR";
         };
         UpdateUserDto: {
             name?: string;
@@ -476,6 +548,51 @@ export interface components {
             /** @enum {string} */
             role?: "ADMIN" | "MANAGER" | "OPERATOR";
             password?: string;
+        };
+        MessageResponseDto: {
+            message: string;
+        };
+        RegisterTenantDto: {
+            companyName: string;
+            document: string;
+            adminName: string;
+            /** Format: email */
+            email: string;
+            password: string;
+        };
+        AuthResponseDto: {
+            user?: {
+                id: string;
+                name: string;
+                email: string;
+                role: string;
+                tenantId: string;
+                authProvider?: string;
+                createdAt?: string;
+                updatedAt?: string;
+            };
+            accessToken?: string;
+        };
+        LoginDto: {
+            /** Format: email */
+            email: string;
+            password: string;
+        };
+        RegisterOAuthTenantDto: {
+            onboardingToken: string;
+            companyName: string;
+            document: string;
+        };
+        RefreshTokenDto: {
+            refreshToken?: string;
+        };
+        CustomerImportResponseDto: {
+            totalProcessed: number;
+            totalImported: number;
+            errors: {
+                row: number;
+                error: string;
+            }[];
         };
         CreateCustomerDto: {
             name: string;
@@ -526,16 +643,16 @@ export interface components {
             email?: string | null;
             phone?: string | null;
             /** @default 0 */
-            basePrice: number;
+            basePrice?: number;
             /** @default 0 */
-            pricePerKg: number;
+            pricePerKg?: number;
             /** @default 3 */
-            deadlineDays: number;
+            deadlineDays?: number;
             /**
              * @default ACTIVE
              * @enum {string}
              */
-            status: "ACTIVE" | "INACTIVE";
+            status?: "ACTIVE" | "INACTIVE";
         };
         CarrierResponseDto: {
             id: string;
@@ -559,16 +676,16 @@ export interface components {
             email?: string | null;
             phone?: string | null;
             /** @default 0 */
-            basePrice: number;
+            basePrice?: number;
             /** @default 0 */
-            pricePerKg: number;
+            pricePerKg?: number;
             /** @default 3 */
-            deadlineDays: number;
+            deadlineDays?: number;
             /**
              * @default ACTIVE
              * @enum {string}
              */
-            status: "ACTIVE" | "INACTIVE";
+            status?: "ACTIVE" | "INACTIVE";
         };
         CarrierMessageResponseDto: {
             message: string;
@@ -679,11 +796,11 @@ export interface components {
              * @default csv
              * @enum {string}
              */
-            format: "csv";
+            format?: "csv";
             startDate?: string;
             endDate?: string;
             /** @default 1000 */
-            limit: number;
+            limit?: number;
         };
         ExportReportResponseDto: {
             jobId?: string;
@@ -828,98 +945,6 @@ export interface operations {
             };
         };
     };
-    UserController_register: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RegisterTenantDto"];
-            };
-        };
-        responses: {
-            /** @description Empresa e Administrador cadastrados com sucesso */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AuthResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_login: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginDto"];
-            };
-        };
-        responses: {
-            /** @description Login bem-sucedido com cookies emitidos */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AuthResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_refreshToken: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RefreshTokenDto"];
-            };
-        };
-        responses: {
-            /** @description Sessão renovada com sucesso */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AuthResponseDto"];
-                };
-            };
-        };
-    };
-    UserController_logout: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Logout efetuado com sucesso */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageResponseDto"];
-                };
-            };
-        };
-    };
     UserController_getMe: {
         parameters: {
             query?: never;
@@ -1028,6 +1053,220 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterTenantDto"];
+            };
+        };
+        responses: {
+            /** @description Empresa e Administrador cadastrados com sucesso */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            /** @description Login bem-sucedido com cookies emitidos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_googleAuth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_googleCallback: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_githubAuth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_githubCallback: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuthController_registerOAuth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterOAuthTenantDto"];
+            };
+        };
+        responses: {
+            /** @description Empresa e Administrador criados via OAuth com sucesso */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_refreshToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshTokenDto"];
+            };
+        };
+        responses: {
+            /** @description Sessão renovada com sucesso */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthResponseDto"];
+                };
+            };
+        };
+    };
+    AuthController_logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Logout efetuado com sucesso */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto"];
+                };
+            };
+        };
+    };
+    CustomerManagementController_importCsv: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Arquivo CSV com os dados dos clientes
+                     */
+                    file?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Resultado da importação em lote com contadores e erros */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomerImportResponseDto"];
                 };
             };
         };

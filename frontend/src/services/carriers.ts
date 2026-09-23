@@ -24,12 +24,12 @@ export const carriersService = {
 
   create: async (payload: CreateCarrierInput): Promise<{ data?: Carrier; error?: string }> => {
     const { data, error } = await rawClient.POST('/carriers', {
-      body: payload as any,
+      body: payload,
     });
     if (error) {
       let msg = 'Falha ao cadastrar transportadora.';
       if (typeof error === 'object' && error !== null && 'message' in error) {
-        const m = (error as any).message;
+        const m = (error as { message?: unknown }).message;
         msg = Array.isArray(m) ? m.join(', ') : String(m);
       }
       return { error: msg };
@@ -45,12 +45,12 @@ export const carriersService = {
       params: {
         path: { id },
       },
-      body: payload as any,
+      body: payload,
     });
     if (error) {
       let msg = 'Falha ao atualizar transportadora.';
       if (typeof error === 'object' && error !== null && 'message' in error) {
-        const m = (error as any).message;
+        const m = (error as { message?: unknown }).message;
         msg = Array.isArray(m) ? m.join(', ') : String(m);
       }
       return { error: msg };
@@ -67,7 +67,7 @@ export const carriersService = {
     if (error) {
       let msg = 'Falha ao excluir transportadora.';
       if (typeof error === 'object' && error !== null && 'message' in error) {
-        const m = (error as any).message;
+        const m = (error as { message?: unknown }).message;
         msg = Array.isArray(m) ? m.join(', ') : String(m);
       }
       return { success: false, error: msg };

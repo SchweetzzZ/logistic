@@ -11,8 +11,8 @@ export const authService = {
           name: data.name,
           email: data.email,
           role: data.role,
-          isTwoFactorEnabled: (data as any).isTwoFactorEnabled ?? false,
-          authProvider: (data as any).authProvider ?? 'LOCAL',
+          isTwoFactorEnabled: (data as { isTwoFactorEnabled?: boolean }).isTwoFactorEnabled ?? false,
+          authProvider: (data as { authProvider?: 'LOCAL' | 'GOOGLE' | 'GITHUB' }).authProvider ?? 'LOCAL',
           initials: data.name
             ? data.name
                 .split(' ')
@@ -74,7 +74,7 @@ export const authService = {
 
   logout: async (): Promise<void> => {
     try {
-      await rawClient.POST('/user/logout');
+      await rawClient.POST('/auth/logout');
     } catch {
       // Falha silenciosa
     } finally {

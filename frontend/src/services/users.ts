@@ -15,18 +15,16 @@ export const usersService = {
     }
   },
 
-  create: async (
-    payload: CreateEmployeeInput,
-  ): Promise<{ data?: UserEmployee; error?: string }> => {
+  create: async (payload: CreateEmployeeInput): Promise<{ data?: UserEmployee; error?: string }> => {
     try {
       const { data, error } = await rawClient.POST('/user', {
-        body: payload as any,
+        body: payload,
       });
 
       if (error) {
         let msg = 'Falha ao cadastrar colaborador.';
         if (typeof error === 'object' && error !== null && 'message' in error) {
-          const m = (error as any).message;
+          const m = (error as { message?: unknown }).message;
           msg = Array.isArray(m) ? m.join(', ') : String(m);
         }
         return { error: msg };
@@ -38,22 +36,19 @@ export const usersService = {
     }
   },
 
-  update: async (
-    id: string,
-    payload: UpdateEmployeeInput,
-  ): Promise<{ data?: UserEmployee; error?: string }> => {
+  update: async (id: string, payload: UpdateEmployeeInput): Promise<{ data?: UserEmployee; error?: string }> => {
     try {
       const { data, error } = await rawClient.PATCH('/user/{id}', {
         params: {
           path: { id },
         },
-        body: payload as any,
+        body: payload,
       });
 
       if (error) {
         let msg = 'Falha ao atualizar colaborador.';
         if (typeof error === 'object' && error !== null && 'message' in error) {
-          const m = (error as any).message;
+          const m = (error as { message?: unknown }).message;
           msg = Array.isArray(m) ? m.join(', ') : String(m);
         }
         return { error: msg };
@@ -76,7 +71,7 @@ export const usersService = {
       if (error) {
         let msg = 'Falha ao remover colaborador.';
         if (typeof error === 'object' && error !== null && 'message' in error) {
-          const m = (error as any).message;
+          const m = (error as { message?: unknown }).message;
           msg = Array.isArray(m) ? m.join(', ') : String(m);
         }
         return { success: false, error: msg };

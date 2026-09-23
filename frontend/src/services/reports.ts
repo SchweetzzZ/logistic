@@ -2,15 +2,11 @@
 
 import { rawClient } from './api';
 import type { ExportFreightReportDto, ExportReportResponse } from '@/src/types';
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { API_BASE_URL } from '@/src/config/api.config';
 
 export const reportsService = {
   // Solicita ao backend o enfileiramento assíncrono da geração de relatório via BullMQ
-  exportReport: async (
-    dto: ExportFreightReportDto,
-  ): Promise<{ data?: ExportReportResponse; error?: string }> => {
+  exportReport: async (dto: ExportFreightReportDto): Promise<{ data?: ExportReportResponse; error?: string }> => {
     try {
       const { data, error } = await rawClient.POST('/freight/reports/export', {
         body: {
@@ -24,17 +20,17 @@ export const reportsService = {
       if (error) {
         let msg = 'Falha ao solicitar geração do relatório.';
         if (typeof error === 'object' && error !== null && 'message' in error) {
-          const m = (error as any).message;
+          const m = (error as { message?: unknown }).message;
           msg = Array.isArray(m) ? m.join(', ') : String(m);
         }
         return { error: msg };
       }
 
       return { data: data as unknown as ExportReportResponse };
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         error:
-          err?.message ||
+          (err instanceof Error ? err.message : null) ||
           'Erro inesperado ao conectar com o serviço de relatórios.',
       };
     }
