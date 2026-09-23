@@ -1,6 +1,7 @@
 import { Controller, Sse, UseGuards, MessageEvent } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
+import { SkipThrottle } from '@nestjs/throttler';
 import { SseNotificationService } from './sse-notification.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import {
@@ -13,6 +14,7 @@ import {
 export class NotificationController {
   constructor(private readonly sseService: SseNotificationService) {}
 
+  @SkipThrottle()
   @Sse('stream')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

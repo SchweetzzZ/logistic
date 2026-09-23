@@ -18,7 +18,7 @@ async function bootstrap() {
 
   // 2. CORS com suporte a Cookies e credenciais
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
   });
 
@@ -50,10 +50,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, cleanupOpenApiDoc(document));
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT;
+  if (!port) {
+    throw new Error('A variável de ambiente PORT não foi configurada.');
+  }
   await app.listen(port);
   logger.log(
-    `🚀 Servidor rodando em http://localhost:${port}/api/docs`,
+    `🚀 Servidor rodando na porta ${port} (Swagger Docs em: /api/docs)`,
     'Bootstrap',
   );
 }

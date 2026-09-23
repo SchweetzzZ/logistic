@@ -1,5 +1,4 @@
 import { Global, Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { drizzle, MySql2Database } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
 
@@ -13,11 +12,11 @@ export * from './database.constants';
   providers: [
     {
       provide: DRIZZLE,
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService): DrizzleDB => {
-        const databaseUrl =
-          configService.get<string>('DATABASE_URL') ||
-          'mysql://logistics_user:logistics_password@localhost:3306/logistics_db';
+      useFactory: (): DrizzleDB => {
+        const databaseUrl = process.env.DATABASE_URL;
+        if (!databaseUrl) {
+          throw new Error('A variável de ambiente DATABASE_URL não foi configurada.');
+        }
 
         const pool = mysql.createPool(databaseUrl);
 
