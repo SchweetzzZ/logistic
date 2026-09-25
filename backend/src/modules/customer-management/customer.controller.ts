@@ -1,37 +1,8 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
-  Body,
-  Query,
-  UseGuards,
-  UseInterceptors,
-  UploadedFile,
-  BadRequestException,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiOkResponse,
-  ApiCreatedResponse,
-  ApiBearerAuth,
-  ApiQuery,
-  ApiConsumes,
-  ApiBody,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, UseInterceptors, UploadedFile, BadRequestException, } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiCreatedResponse, ApiBearerAuth, ApiQuery, ApiConsumes, ApiBody, } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-
 import { CustomerManagementService } from './customer.service';
-import {
-  CreateCustomerDto,
-  UpdateCustomerDto,
-  CustomerResponseDto,
-  MessageResponseDto,
-  CustomerImportResponseDto,
-} from './dto/customer-manegement-dto';
+import { CreateCustomerDto, UpdateCustomerDto, CustomerResponseDto, MessageResponseDto, CustomerImportResponseDto, } from './dto/customer-manegement-dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
 import { RequirePermission } from '../common/decorators/permissions.decorator';
@@ -44,7 +15,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('customers')
 export class CustomerManagementController {
-  constructor(private readonly customerService: CustomerManagementService) {}
+  constructor(private readonly customerService: CustomerManagementService) { }
 
   @Post('import')
   @RequirePermission(PERMISSIONS.customers.import)
@@ -67,11 +38,7 @@ export class CustomerManagementController {
     type: CustomerImportResponseDto,
     description: 'Resultado da importação em lote com contadores e erros',
   })
-  async importCsv(
-    @CurrentTenant() tenantId: string,
-    @CurrentUser('userId') userId: string,
-    @UploadedFile() file?: Express.Multer.File,
-  ): Promise<CustomerImportResponseDto> {
+  async importCsv(@CurrentTenant() tenantId: string, @CurrentUser('userId') userId: string, @UploadedFile() file?: Express.Multer.File,): Promise<CustomerImportResponseDto> {
     if (!file || !file.buffer) {
       throw new BadRequestException('Nenhum arquivo CSV foi enviado.');
     }
@@ -90,11 +57,7 @@ export class CustomerManagementController {
     type: CustomerResponseDto,
     description: 'Cliente cadastrado com sucesso',
   })
-  async create(
-    @CurrentTenant() tenantId: string,
-    @CurrentUser('userId') userId: string,
-    @Body() dto: CreateCustomerDto,
-  ): Promise<CustomerResponseDto> {
+  async create(@CurrentTenant() tenantId: string, @CurrentUser('userId') userId: string, @Body() dto: CreateCustomerDto,): Promise<CustomerResponseDto> {
     return this.customerService.create(tenantId, dto, userId);
   }
 
@@ -112,10 +75,7 @@ export class CustomerManagementController {
     type: [CustomerResponseDto],
     description: 'Lista de clientes do tenant atual',
   })
-  async findAll(
-    @CurrentTenant() tenantId: string,
-    @Query('search') search?: string,
-  ): Promise<CustomerResponseDto[]> {
+  async findAll(@CurrentTenant() tenantId: string, @Query('search') search?: string,): Promise<CustomerResponseDto[]> {
     return this.customerService.findAll(tenantId, search);
   }
 
@@ -126,10 +86,7 @@ export class CustomerManagementController {
     type: CustomerResponseDto,
     description: 'Dados detalhados do cliente',
   })
-  async findById(
-    @CurrentTenant() tenantId: string,
-    @Param('id') id: string,
-  ): Promise<CustomerResponseDto> {
+  async findById(@CurrentTenant() tenantId: string, @Param('id') id: string,): Promise<CustomerResponseDto> {
     return this.customerService.findById(tenantId, id);
   }
 
@@ -140,12 +97,7 @@ export class CustomerManagementController {
     type: CustomerResponseDto,
     description: 'Cliente atualizado com sucesso',
   })
-  async update(
-    @CurrentTenant() tenantId: string,
-    @CurrentUser('userId') userId: string,
-    @Param('id') id: string,
-    @Body() dto: UpdateCustomerDto,
-  ): Promise<CustomerResponseDto> {
+  async update(@CurrentTenant() tenantId: string, @CurrentUser('userId') userId: string, @Param('id') id: string, @Body() dto: UpdateCustomerDto,): Promise<CustomerResponseDto> {
     return this.customerService.update(tenantId, id, dto, userId);
   }
 
@@ -156,11 +108,7 @@ export class CustomerManagementController {
     type: MessageResponseDto,
     description: 'Cliente removido com sucesso',
   })
-  async remove(
-    @CurrentTenant() tenantId: string,
-    @CurrentUser('userId') userId: string,
-    @Param('id') id: string,
-  ): Promise<MessageResponseDto> {
+  async remove(@CurrentTenant() tenantId: string, @CurrentUser('userId') userId: string, @Param('id') id: string,): Promise<MessageResponseDto> {
     return this.customerService.remove(tenantId, id, userId);
   }
 }

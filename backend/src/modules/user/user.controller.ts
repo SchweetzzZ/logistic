@@ -12,7 +12,7 @@ import { PermissionsGuard } from '../common/guards/permissions.guard';
 @ApiTags('Users')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -37,11 +37,7 @@ export class UserController {
     type: UserResponseDto,
     description: 'Colaborador cadastrado com sucesso',
   })
-  async createEmployee(
-    @CurrentTenant() tenantId: string,
-    @CurrentUser('userId') currentUserId: string,
-    @Body() dto: CreateUserDto,
-  ): Promise<UserResponseDto> {
+  async createEmployee(@CurrentTenant() tenantId: string, @CurrentUser('userId') currentUserId: string, @Body() dto: CreateUserDto,): Promise<UserResponseDto> {
     return this.userService.createEmployee(tenantId, dto, currentUserId);
   }
 
@@ -56,9 +52,7 @@ export class UserController {
     type: [UserResponseDto],
     description: 'Lista de usuários do tenant atual',
   })
-  async listUsers(
-    @CurrentTenant() tenantId: string,
-  ): Promise<UserResponseDto[]> {
+  async listUsers(@CurrentTenant() tenantId: string,): Promise<UserResponseDto[]> {
     return this.userService.findAllByTenant(tenantId);
   }
 
@@ -73,12 +67,7 @@ export class UserController {
     type: UserResponseDto,
     description: 'Colaborador atualizado com sucesso',
   })
-  async updateEmployee(
-    @CurrentTenant() tenantId: string,
-    @CurrentUser('userId') currentUserId: string,
-    @Param('id') id: string,
-    @Body() dto: UpdateUserDto,
-  ): Promise<UserResponseDto> {
+  async updateEmployee(@CurrentTenant() tenantId: string, @CurrentUser('userId') currentUserId: string, @Param('id') id: string, @Body() dto: UpdateUserDto): Promise<UserResponseDto> {
     return this.userService.update(tenantId, id, dto, currentUserId);
   }
 
@@ -93,11 +82,7 @@ export class UserController {
     type: MessageResponseDto,
     description: 'Colaborador removido com sucesso',
   })
-  async removeEmployee(
-    @CurrentTenant() tenantId: string,
-    @CurrentUser('userId') currentUserId: string,
-    @Param('id') id: string,
-  ): Promise<MessageResponseDto> {
+  async removeEmployee(@CurrentTenant() tenantId: string, @CurrentUser('userId') currentUserId: string, @Param('id') id: string): Promise<MessageResponseDto> {
     return this.userService.remove(tenantId, currentUserId, id);
   }
 }

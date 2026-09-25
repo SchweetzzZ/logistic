@@ -2,16 +2,8 @@ import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 
 export const createCarrierSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, 'O nome deve ter no mínimo 2 caracteres')
-    .max(150),
-  document: z
-    .string()
-    .trim()
-    .min(11, 'Documento inválido')
-    .max(20, 'Documento inválido'),
+  name: z.string().trim().min(2, 'O nome deve ter no mínimo 2 caracteres').max(150),
+  document: z.string().trim().min(11, 'Documento inválido').max(20, 'Documento inválido'),
   email: z.string().trim().email('E-mail inválido').optional().nullable(),
   phone: z.string().trim().max(20).optional().nullable(),
   basePrice: z.number().min(0, 'Taxa base deve ser maior ou igual a zero').optional().default(0),

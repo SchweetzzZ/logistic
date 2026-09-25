@@ -39,45 +39,6 @@ export const PERMISSIONS = {
   audit: {
     read: 'audit:read',
   },
-  // Uppercase aliases for developer convenience
-  CARRIERS: {
-    READ: 'carriers:read',
-    CREATE: 'carriers:create',
-    UPDATE: 'carriers:update',
-    DELETE: 'carriers:delete',
-    IMPORT: 'carriers:import',
-  },
-  CUSTOMERS: {
-    READ: 'customers:read',
-    CREATE: 'customers:create',
-    UPDATE: 'customers:update',
-    DELETE: 'customers:delete',
-    IMPORT: 'customers:import',
-    EXPORT: 'customers:export',
-  },
-  FREIGHT: {
-    SIMULATE: 'freight:simulate',
-    READ: 'freight:read',
-    EXPORT: 'freight:export',
-  },
-  REPORTS: {
-    READ: 'reports:read',
-    GENERATE: 'reports:generate',
-    EXPORT: 'reports:export',
-  },
-  USERS: {
-    READ: 'users:read',
-    CREATE: 'users:create',
-    UPDATE: 'users:update',
-    DELETE: 'users:delete',
-  },
-  TENANTS: {
-    READ: 'tenants:read',
-    UPDATE: 'tenants:update',
-  },
-  AUDIT: {
-    READ: 'audit:read',
-  },
 } as const;
 
 export type PermissionKey =
@@ -173,12 +134,9 @@ export const ROLE_PERMISSIONS: Record<Role, readonly PermissionKey[]> = {
   ],
 };
 
-export function getPermissionsForRole(
-  role: Role | string,
-): readonly PermissionKey[] {
-  if (!role) {
-    return [];
-  }
+export function getPermissionsForRole(role: Role | string): readonly PermissionKey[] {
+  if (!role) return [];
+
   const upperRole = String(role).toUpperCase() as Role;
   if (upperRole in ROLE_PERMISSIONS) {
     return ROLE_PERMISSIONS[upperRole];
@@ -186,10 +144,7 @@ export function getPermissionsForRole(
   return [];
 }
 
-export function checkRolePermission(
-  role: Role | string,
-  required: PermissionKey,
-): boolean {
+export function checkRolePermission(role: Role | string, required: PermissionKey): boolean {
   const permissions = getPermissionsForRole(role);
   return permissions.includes(required);
 }

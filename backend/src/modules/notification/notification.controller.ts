@@ -4,15 +4,12 @@ import { Observable } from 'rxjs';
 import { SkipThrottle } from '@nestjs/throttler';
 import { SseNotificationService } from './sse-notification.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import {
-  CurrentUser,
-  type AuthenticatedUser,
-} from '../common/decorators/current-user.decorator';
+import { CurrentUser, type AuthenticatedUser } from '../common/decorators/current-user.decorator';
 
 @ApiTags('Notifications')
 @Controller('notifications')
 export class NotificationController {
-  constructor(private readonly sseService: SseNotificationService) {}
+  constructor(private readonly sseService: SseNotificationService) { }
 
   @SkipThrottle()
   @Sse('stream')

@@ -3,10 +3,7 @@ import { z } from 'zod';
 import { Role } from '../../common/enums/role.enum';
 
 export const CreateUserSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, 'O nome deve ter no mínimo 2 caracteres')
+  name: z.string().trim().min(2, 'O nome deve ter no mínimo 2 caracteres')
     .max(100, 'O nome deve ter no máximo 100 caracteres'),
   email: z.string().trim().toLowerCase().email('E-mail em formato inválido'),
   password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
@@ -15,29 +12,19 @@ export const CreateUserSchema = z.object({
     .default(Role.OPERATOR),
 });
 
-export class CreateUserDto extends createZodDto(CreateUserSchema) {}
+export class CreateUserDto extends createZodDto(CreateUserSchema) { }
 
 export const UpdateUserSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, 'O nome deve ter no mínimo 2 caracteres')
+  name: z.string().trim().min(2, 'O nome deve ter no mínimo 2 caracteres')
     .max(100, 'O nome deve ter no máximo 100 caracteres')
     .optional(),
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email('E-mail em formato inválido')
+  email: z.string().trim().toLowerCase().email('E-mail em formato inválido')
     .optional(),
   role: z.enum([Role.ADMIN, Role.MANAGER, Role.OPERATOR]).optional(),
-  password: z
-    .string()
-    .min(6, 'A senha deve ter no mínimo 6 caracteres')
-    .optional(),
+  password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres').optional(),
 });
 
-export class UpdateUserDto extends createZodDto(UpdateUserSchema) {}
+export class UpdateUserDto extends createZodDto(UpdateUserSchema) { }
 
 export const UserResponseSchema = z.object({
   id: z.string(),
@@ -50,7 +37,7 @@ export const UserResponseSchema = z.object({
   updatedAt: z.string().optional(),
 });
 
-export class UserResponseDto extends createZodDto(UserResponseSchema) {}
+export class UserResponseDto extends createZodDto(UserResponseSchema) { }
 
 // Re-export common message response DTOs
 export {

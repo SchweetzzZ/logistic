@@ -73,7 +73,6 @@ export class AuthService {
 
     // 2. Executar transação ACID no MySQL via Drizzle
     return this.db.transaction(async (tx) => {
-      // Inserir Tenant
       await tx.insert(tenants).values({
         name: dto.companyName,
         document: dto.document,
@@ -84,7 +83,6 @@ export class AuthService {
 
       const passwordHash = await bcrypt.hash(dto.password, 10);
 
-      // Inserir Admin da Empresa
       await tx.insert(users).values({
         name: dto.adminName,
         email: dto.email,
@@ -161,7 +159,7 @@ export class AuthService {
   }
 
 
-  //Se o usuário já existe: efetua login direto ou exige MFA se estiver habilitado.
+  //Se o usuário já existe: efetua login direto
   //Se o usuário NÃO existe: gera um token de onboarding temporário para que ele conclua informando o CNPJ da empresa.
 
   async handleOAuthLogin(profile: OAuthUserPayload, ipAddress?: string, userAgent?: string): Promise<OAuthLoginResult> {
@@ -228,9 +226,7 @@ export class AuthService {
     };
   }
 
-  /**
-   * Conclui o cadastro da nova empresa e usuário originados via OAuth (com CNPJ preenchido).
-   */
+  // Conclui o cadastro da nova empresa e usuário originados via OAuth (com CNPJ preenchido).
   async registerOAuthTenant(dto: RegisterOAuthTenantDto, ipAddress?: string, userAgent?: string): Promise<{ user: UserResponseDto; accessToken: string; refreshToken: string }> {
     let payload: {
       email: string;

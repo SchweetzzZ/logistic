@@ -17,4 +17,4 @@ import { NotificationModule } from '../notification/notification.module';
   providers: [FreightService, FreightReportProcessor],
   exports: [FreightService],
 })
-export class FreightModule {}
+export class FreightModule { }

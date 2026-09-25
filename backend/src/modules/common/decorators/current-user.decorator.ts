@@ -8,18 +8,12 @@ export interface AuthenticatedUser {
   tenantId: string;
 }
 
-export const CurrentUser = createParamDecorator(
-  (
-    data: keyof AuthenticatedUser | undefined,
-    ctx: ExecutionContext,
-  ): AuthenticatedUser | string | undefined => {
-    const request = ctx
-      .switchToHttp()
-      .getRequest<Request & { user?: AuthenticatedUser }>();
-    const user = request.user;
-    if (!user) {
-      return undefined;
-    }
-    return data ? user[data] : user;
-  },
+export const CurrentUser = createParamDecorator((data: keyof AuthenticatedUser | undefined, ctx: ExecutionContext): AuthenticatedUser | string | undefined => {
+  const request = ctx.switchToHttp().getRequest<Request & { user?: AuthenticatedUser }>();
+  const user = request.user;
+  if (!user) {
+    return undefined;
+  }
+  return data ? user[data] : user;
+},
 );

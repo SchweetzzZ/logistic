@@ -19,15 +19,8 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     });
   }
 
-  async validate(
-    _accessToken: string,
-    _refreshToken: string,
-    profile: Profile,
-    done: (err: any, user: any) => void,
-  ): Promise<any> {
-    const email =
-      profile.emails?.[0]?.value ||
-      `${profile.username}@users.noreply.github.com`;
+  async validate(_accessToken: string, _refreshToken: string, profile: Profile, done: (err: any, user: any) => void,): Promise<any> {
+    const email = profile.emails?.[0]?.value || `${profile.username}@users.noreply.github.com`;
     const name = profile.displayName || profile.username || 'Usuário GitHub';
     const avatarUrl = profile.photos?.[0]?.value;
 

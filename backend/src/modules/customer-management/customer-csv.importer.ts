@@ -16,10 +16,7 @@ const CUSTOMER_ALIASES = {
   state: ['estado', 'state', 'uf'],
 };
 
-export type CustomerImportRow = Omit<
-  NewCustomer,
-  'id' | 'createdAt' | 'updatedAt'
->;
+export type CustomerImportRow = Omit<NewCustomer, 'id' | 'createdAt' | 'updatedAt'>;
 
 export function parseCustomersCsv(buffer: Buffer, tenantId: string, existingCpfs: Set<string>,): CsvImportResult & { rows: CustomerImportRow[] } {
   const lines = splitCsvLines(buffer);
@@ -29,13 +26,7 @@ export function parseCustomersCsv(buffer: Buffer, tenantId: string, existingCpfs
     return {
       totalProcessed: 0,
       totalImported: 0,
-      errors: [
-        {
-          row: 1,
-          error:
-            'O arquivo CSV precisa conter ao menos uma linha de cabeçalho e uma linha de dados',
-        },
-      ],
+      errors: [{ row: 1, error: 'O arquivo CSV precisa conter ao menos uma linha de cabeçalho e uma linha de dados' }],
       rows: [],
     };
   }
@@ -50,13 +41,7 @@ export function parseCustomersCsv(buffer: Buffer, tenantId: string, existingCpfs
     return {
       totalProcessed: 0,
       totalImported: 0,
-      errors: [
-        {
-          row: 1,
-          error:
-            'Cabeçalho CSV inválido. As colunas "nome" (ou "name") e "cpf" são obrigatórias.',
-        },
-      ],
+      errors: [{ row: 1, error: 'Cabeçalho CSV inválido. As colunas "nome" (ou "name") e "cpf" são obrigatórias.' }],
       rows: [],
     };
   }
@@ -83,35 +68,22 @@ export function parseCustomersCsv(buffer: Buffer, tenantId: string, existingCpfs
     const state = get('state');
 
     if (!name || name.length < 2) {
-      errors.push({
-        row: rowNumber,
-        error:
-          'Nome do cliente é obrigatório e deve ter no mínimo 2 caracteres',
-      });
+      errors.push({ row: rowNumber, error: 'Nome do cliente é obrigatório e deve ter no mínimo 2 caracteres' });
       continue;
     }
 
     if (cleanCpf.length !== 11) {
-      errors.push({
-        row: rowNumber,
-        error: `CPF inválido ("${rawCpf}"). Deve conter 11 dígitos numéricos`,
-      });
+      errors.push({ row: rowNumber, error: `CPF inválido ("${rawCpf}"). Deve conter 11 dígitos numéricos` });
       continue;
     }
 
     if (existingCpfs.has(cleanCpf)) {
-      errors.push({
-        row: rowNumber,
-        error: `CPF ${cleanCpf} já cadastrado nesta empresa`,
-      });
+      errors.push({ row: rowNumber, error: `CPF ${cleanCpf} já cadastrado nesta empresa` });
       continue;
     }
 
     if (seenCpfsInFile.has(cleanCpf)) {
-      errors.push({
-        row: rowNumber,
-        error: `CPF ${cleanCpf} duplicado no próprio arquivo CSV`,
-      });
+      errors.push({ row: rowNumber, error: `CPF ${cleanCpf} duplicado no próprio arquivo CSV` });
       continue;
     }
 

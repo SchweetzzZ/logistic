@@ -60,19 +60,12 @@ export class CustomerManagementService {
       ? and(eq(customers.tenantId, tenantId), searchFilter)
       : eq(customers.tenantId, tenantId);
 
-    return this.db
-      .select()
-      .from(customers)
-      .where(whereClause)
-      .orderBy(desc(customers.createdAt));
+    return this.db.select().from(customers).where(whereClause).orderBy(desc(customers.createdAt));
   }
 
   async findById(tenantId: string, id: string): Promise<Customer> {
-    const [customer] = await this.db
-      .select()
-      .from(customers)
-      .where(and(eq(customers.id, id), eq(customers.tenantId, tenantId)))
-      .limit(1);
+    const [customer] = await this.db.select().from(customers).where
+      (and(eq(customers.id, id), eq(customers.tenantId, tenantId))).limit(1);
 
     if (!customer) {
       throw new NotFoundException('Cliente não encontrado nesta empresa');
@@ -81,27 +74,11 @@ export class CustomerManagementService {
     return customer;
   }
 
-  async update(
-    tenantId: string,
-    id: string,
-    dto: UpdateCustomerDto,
-    userId?: string,
-  ): Promise<Customer> {
+  async update(tenantId: string, id: string, dto: UpdateCustomerDto, userId?: string,): Promise<Customer> {
     const current = await this.findById(tenantId, id);
 
     const diff: Record<string, { from: any; to: any }> = {};
-    const fields = [
-      'name',
-      'email',
-      'cpf',
-      'phone',
-      'zipCode',
-      'street',
-      'number',
-      'complement',
-      'city',
-      'state',
-    ] as const;
+    const fields = ['name', 'email', 'cpf', 'phone', 'zipCode', 'street', 'number', 'complement', 'city', 'state'] as const;
     for (const field of fields) {
       if (dto[field] !== undefined && dto[field] !== current[field]) {
         diff[field] = { from: current[field], to: dto[field] };
@@ -113,29 +90,15 @@ export class CustomerManagementService {
     }
 
     if (dto.cpf && dto.cpf !== current.cpf) {
-      const [conflict] = await this.db
-        .select()
-        .from(customers)
-        .where(
-          and(
-            eq(customers.tenantId, tenantId),
-            eq(customers.cpf, dto.cpf),
-            ne(customers.id, id),
-          ),
-        )
-        .limit(1);
+      const [conflict] = await this.db.select().from(customers).where
+        (and(eq(customers.tenantId, tenantId), eq(customers.cpf, dto.cpf), ne(customers.id, id),)).limit(1);
 
       if (conflict) {
-        throw new ConflictException(
-          'Já existe outro cliente cadastrado com este CPF nesta empresa',
-        );
+        throw new ConflictException('Já existe outro cliente cadastrado com este CPF nesta empresa');
       }
     }
 
-    await this.db
-      .update(customers)
-      .set(dto)
-      .where(and(eq(customers.id, id), eq(customers.tenantId, tenantId)));
+    await this.db.update(customers).set(dto).where(and(eq(customers.id, id), eq(customers.tenantId, tenantId)));
 
     const updated = await this.findById(tenantId, id);
 
@@ -154,16 +117,10 @@ export class CustomerManagementService {
     return updated;
   }
 
-  async remove(
-    tenantId: string,
-    id: string,
-    userId?: string,
-  ): Promise<{ message: string }> {
+  async remove(tenantId: string, id: string, userId?: string,): Promise<{ message: string }> {
     const current = await this.findById(tenantId, id);
 
-    await this.db
-      .delete(customers)
-      .where(and(eq(customers.id, id), eq(customers.tenantId, tenantId)));
+    await this.db.delete(customers).where(and(eq(customers.id, id), eq(customers.tenantId, tenantId)));
 
     await this.auditService.log({
       tenantId,
@@ -186,17 +143,10 @@ export class CustomerManagementService {
 
     const existingCpfs = new Set(existingRecords.map((r) => r.cpf.replace(/\D/g, '')));
 
-    const { rows, totalProcessed, totalImported, errors } = parseCustomersCsv(
-      fileBuffer,
-      tenantId,
-      existingCpfs,
-    );
+    const { rows, totalProcessed, totalImported, errors } = parseCustomersCsv(fileBuffer, tenantId, existingCpfs);
 
     if (rows.length > 0) {
-      await insertInBatches(
-        (batch) => this.db.insert(customers).values(batch),
-        rows,
-      );
+      await insertInBatches((batch) => this.db.insert(customers).values(batch), rows);
 
       await this.auditService.log({
         tenantId,

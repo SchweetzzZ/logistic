@@ -1,11 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger, } from '@nestjs/common';
 import type { Response } from 'express';
 import { ZodValidationException } from 'nestjs-zod';
 import { RequestContext } from '../../observability/request-context.service';
@@ -26,9 +19,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const zodError = exception.getZodError();
       message =
         typeof zodError === 'object' &&
-        zodError !== null &&
-        'format' in zodError &&
-        typeof (zodError as { format: () => unknown }).format === 'function'
+          zodError !== null &&
+          'format' in zodError &&
+          typeof (zodError as { format: () => unknown }).format === 'function'
           ? (zodError as { format: () => unknown }).format()
           : zodError;
     } else if (exception instanceof HttpException) {

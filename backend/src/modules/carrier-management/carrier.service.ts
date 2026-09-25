@@ -186,24 +186,16 @@ export class carrierService {
   }
 
   // Importa transportadoras em lote a partir de arquivo CSV
-  async importCsv(tenantId: string, fileBuffer: Buffer, userId?: string, originalFilename?: string,): Promise<CsvImportResult> {
-    const existingRecords = await this.db
-      .select({
-        name: carrierSchema.name,
-        document: carrierSchema.document,
-      })
-      .from(carrierSchema)
-      .where(eq(carrierSchema.tenantId, tenantId));
+  async importCsv(tenantId: string, fileBuffer: Buffer, userId?: string, originalFilename?: string): Promise<CsvImportResult> {
+    const existingRecords = await this.db.select({
+      name: carrierSchema.name,
+      document: carrierSchema.document,
+    }).from(carrierSchema).where(eq(carrierSchema.tenantId, tenantId));
 
-    const existingDocs = new Set(
-      existingRecords.map((r) => r.document.replace(/\D/g, '')),
-    );
-    const existingNames = new Set(
-      existingRecords.map((r) => r.name.toLowerCase().trim()),
-    );
+    const existingDocs = new Set(existingRecords.map((r) => r.document.replace(/\D/g, '')));
+    const existingNames = new Set(existingRecords.map((r) => r.name.toLowerCase().trim()));
 
-    const { rows, totalProcessed, totalImported, errors } = parseCarriersCsv(
-      fileBuffer,
+    const { rows, totalProcessed, totalImported, errors } = parseCarriersCsv(fileBuffer,
       tenantId,
       existingDocs,
       existingNames,

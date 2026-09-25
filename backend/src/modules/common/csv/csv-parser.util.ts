@@ -66,23 +66,13 @@ export function buildHeaderMap(
 }
 
 /** Retorna o valor de uma coluna pelo nome canônico (string vazia se ausente) */
-export function getCol(
-  cols: string[],
-  headerMap: Record<string, string>,
-  key: string,
-): string {
+export function getCol(cols: string[], headerMap: Record<string, string>, key: string): string {
   const idx = headerMap[key];
-  return idx !== undefined && cols[Number(idx)] !== undefined
-    ? cols[Number(idx)].trim()
-    : '';
+  return idx !== undefined && cols[Number(idx)] !== undefined ? cols[Number(idx)].trim() : '';
 }
 
 /** Insere rows no banco em lotes de batchSize */
-export async function insertInBatches<T>(
-  insertFn: (batch: T[]) => Promise<any>,
-  rows: T[],
-  batchSize = 100,
-): Promise<void> {
+export async function insertInBatches<T>(insertFn: (batch: T[]) => Promise<any>, rows: T[], batchSize = 100): Promise<void> {
   for (let i = 0; i < rows.length; i += batchSize) {
     await insertFn(rows.slice(i, i + batchSize));
   }

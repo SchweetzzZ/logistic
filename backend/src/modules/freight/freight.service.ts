@@ -1,54 +1,27 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { DRIZZLE, type DrizzleDB } from '../database/database.constants';
-import {
-  carrierSchema,
-  type Carrier,
-} from '../carrier-management/schemas/schema';
+import { carrierSchema, type Carrier } from '../carrier-management/schemas/schema';
 import { auditFreightSchema } from './schemas/schema';
 import { SimulateFreightDto } from './dto/freight.dto';
-import type {
-  LocationInfo,
-  FreightQuote,
-  SimulationResult,
-} from './dto/freight.types';
+import type { LocationInfo, FreightQuote, SimulationResult } from './dto/freight.types';
 
 // Tabela de faixas de CEP → UF (Correios). Usado apenas como fallback caso a BrasilAPI falhe.
 const CEP_RANGES: [number, number, string][] = [
-  [1, 19, 'SP'],
-  [20, 28, 'RJ'],
-  [29, 29, 'ES'],
-  [30, 39, 'MG'],
-  [40, 48, 'BA'],
-  [49, 49, 'SE'],
-  [50, 56, 'PE'],
-  [57, 57, 'AL'],
-  [58, 58, 'PB'],
-  [59, 59, 'RN'],
-  [60, 63, 'CE'],
-  [64, 64, 'PI'],
-  [65, 65, 'MA'],
-  [66, 68, 'PA'],
-  [69, 69, 'AM'],
-  [70, 72, 'DF'],
-  [73, 76, 'GO'],
-  [77, 77, 'TO'],
-  [78, 78, 'MT'],
-  [79, 79, 'MS'],
-  [80, 87, 'PR'],
-  [88, 89, 'SC'],
-  [90, 99, 'RS'],
+  [1, 19, 'SP'], [20, 28, 'RJ'], [29, 29, 'ES'], [30, 39, 'MG'], [40, 48, 'BA'],
+  [49, 49, 'SE'], [50, 56, 'PE'], [57, 57, 'AL'], [58, 58, 'PB'], [59, 59, 'RN'],
+  [60, 63, 'CE'], [64, 64, 'PI'], [65, 65, 'MA'], [66, 68, 'PA'], [69, 69, 'AM'],
+  [70, 72, 'DF'], [73, 76, 'GO'], [77, 77, 'TO'], [78, 78, 'MT'], [79, 79, 'MS'],
+  [80, 87, 'PR'], [88, 89, 'SC'], [90, 99, 'RS'],
 ];
 
 @Injectable()
 export class FreightService {
   private readonly logger = new Logger(FreightService.name);
 
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) { }
 
-  /**
-   * Consulta localização via BrasilAPI com timeout de 3.5s e fallback por prefixo de CEP.
-   */
+  // Consulta localização via BrasilAPI com timeout de 3.5s e fallback por prefixo de CEP
   async getZipCodeInfo(zipCode: string): Promise<LocationInfo> {
     try {
       const response = await fetch(
@@ -69,21 +42,13 @@ export class FreightService {
     }
 
     const prefix = parseInt(zipCode.substring(0, 2), 10);
-    const state =
-      CEP_RANGES.find(([min, max]) => prefix >= min && prefix <= max)?.[2] ??
-      'SP';
+    const state = CEP_RANGES.find(([min, max]) => prefix >= min && prefix <= max)?.[2] ?? 'SP';
 
     return { zipCode, city: 'Localidade Estimada', state, isEstimated: true };
   }
 
-  /**
-   * Executa a simulação completa de frete
-   */
-  async simulateFreight(
-    tenantId: string,
-    dto: SimulateFreightDto,
-    userId?: string,
-  ): Promise<SimulationResult> {
+  // Executa a simulação completa de frete
+  async simulateFreight(tenantId: string, dto: SimulateFreightDto, userId?: string): Promise<SimulationResult> {
     // 1. Consulta de Origem e Destino em paralelo via BrasilAPI
     const [origin, destination] = await Promise.all([
       this.getZipCodeInfo(dto.originZipCode || '01001000'),
@@ -127,10 +92,7 @@ export class FreightService {
     if (dto.carrierId)
       whereConditions.push(eq(carrierSchema.id, dto.carrierId));
 
-    const carriers: Carrier[] = await this.db
-      .select()
-      .from(carrierSchema)
-      .where(and(...whereConditions));
+    const carriers: Carrier[] = await this.db.select().from(carrierSchema).where(and(...whereConditions));
 
     if (dto.carrierId && carriers.length === 0) {
       throw new NotFoundException(
@@ -221,22 +183,16 @@ export class FreightService {
     return result;
   }
 
-  /**
-   * Consulta paginada do histórico de simulações realizadas no tenant
-   */
+  // Consulta paginada do histórico de simulações realizadas no tenant
   async getHistory(tenantId: string, page = 1, limit = 20) {
     const offset = (page - 1) * limit;
 
-    const [totalResult] = await this.db
-      .select({ count: sql<number>`count(*)` })
-      .from(auditFreightSchema)
+    const [totalResult] = await this.db.select({ count: sql<number>`count(*)` }).from(auditFreightSchema)
       .where(eq(auditFreightSchema.tenantId, tenantId));
 
     const total = Number(totalResult?.count || 0);
 
-    const data = await this.db
-      .select()
-      .from(auditFreightSchema)
+    const data = await this.db.select().from(auditFreightSchema)
       .where(eq(auditFreightSchema.tenantId, tenantId))
       .orderBy(desc(auditFreightSchema.createdAt))
       .limit(limit)
