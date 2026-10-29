@@ -53,3 +53,6 @@ Thumbs.db
 
 # Data and CSV files
 *.csv
+
+# Docs internas
+arquitetura_assincrono_tempo_real.md
