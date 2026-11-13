@@ -22,7 +22,10 @@
     "db:migrate": "drizzle-kit migrate",
     "db:migrate:prod": "node dist/modules/database/migrate.js",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:ai:generate": "drizzle-kit generate --config drizzle-ai.config.ts",
+    "db:ai:migrate": "drizzle-kit migrate --config drizzle-ai.config.ts",
+    "db:ai:studio": "drizzle-kit studio --config drizzle-ai.config.ts"
   },
   "dependencies": {
     "@google/genai": "^3.2.0",
@@ -50,6 +53,7 @@
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
+    "pg": "^8.23.1",
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
@@ -70,6 +74,7 @@
     "@types/passport-github2": "^1.2.9",
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/passport-jwt": "^4.0.1",
+    "@types/pg": "^8.23.1",
     "@types/qrcode": "^1.5.6",
     "@types/supertest": "^6.0.2",
     "drizzle-kit": "^0.31.10",

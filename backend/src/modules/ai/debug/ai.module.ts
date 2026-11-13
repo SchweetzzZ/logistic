@@ -4,9 +4,11 @@ import { CHAT_MODEL, EMBEDDINGS, FALLBACK_CHAT_MODEL } from "../ai.constants";
 import { createChatModel } from "../models/chat-model.factory";
 import { createEmbeddings } from "../models/embeddings.factory";
 import { AiDebugController } from "./ai-debug.controller";
+import { AiDatabaseModule } from '../database/ai-database.module';
 import { AiDebugService } from "./ai-debug.service";
 
 @Module({
+    imports: [AiDatabaseModule],
     controllers: [AiDebugController],
     providers: [
         {

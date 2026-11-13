@@ -45,7 +45,7 @@ export class GeminiEmbeddings extends Embeddings {
 
     async embedQuery(text: string): Promise<number[]> {
         const [vector] = await this.embedBatch([
-            `task: search result | query ${text}`
+            `task: search result | query: ${text}`
         ])
         return vector
     }
@@ -53,7 +53,7 @@ export class GeminiEmbeddings extends Embeddings {
     private async embedBatch(contents: string[]): Promise<number[][]> {
         const response = await this.caller.call(() => this.client.models.embedContent({
             model: this.model,
-            contents,
+            contents: contents.map((text) => ({ role: "user", parts: [{ text }] })),
             config: { outputDimensionality: this.dimensions }
         }),
         )
@@ -67,7 +67,7 @@ export class GeminiEmbeddings extends Embeddings {
         for (const vector of vectors) {
             if (vector.length !== this.dimensions) {
                 throw new Error(
-                    `Embedding: esperava ${this.dimensions} dimensões, recebi ${vectors.length}`
+                    `Embedding: esperava ${this.dimensions} dimensões, recebi ${vector.length}`
                 )
             }
         }

@@ -5,6 +5,7 @@ import { registerAs } from '@nestjs/config';
  * Lida uma vez na inicialização; injete com @Inject(aiConfig.KEY).
  */
 export const aiConfig = registerAs('ai', () => ({
+    databaseUrl: process.env.AI_DATABASE_URL ?? "",
     geminiApiKey: process.env.GEMINI_API_KEY ?? '',
     chatModel: process.env.AI_CHAT_MODEL ?? 'gemini-3.5-flash-lite',
     // Vazio = sem modelo reserva
