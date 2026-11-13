@@ -16,14 +16,15 @@ import { FreightModule } from './modules/freight/freight.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { ObservabilityModule } from './modules/observability/observability.module';
-
+import { aiConfig, AiConfig } from './config/ai.config';
+import { AiModule } from './modules/ai/debug/ai.module';
 import { authConfig } from './config/auth.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [authConfig],
+      load: [authConfig, aiConfig],
       envFilePath: ['.env'],
     }),
     BullModule.forRootAsync({
@@ -64,6 +65,9 @@ import { authConfig } from './config/auth.config';
     CustomerManagementModule,
     CarrierManagementModule,
     FreightModule,
+    AiModule,
+
+
   ],
   controllers: [AppController],
   providers: [
@@ -74,4 +78,4 @@ import { authConfig } from './config/auth.config';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
