@@ -5,6 +5,7 @@
     "test",
     "dist",
     "**/*spec.ts",
-    "drizzle.config.ts"
+    "drizzle.config.ts",
+    "drizzle-ai.config.ts"
   ]
 }
