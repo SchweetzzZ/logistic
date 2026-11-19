@@ -7,9 +7,6 @@ import { cosineSimilarity } from '@langchain/core/utils/math';
 import { CHAT_MODEL, EMBEDDINGS, FALLBACK_CHAT_MODEL } from '../ai.constants';
 import { AiProviderUnavailableError } from '../models/ai-provider.error';
 import type { AskDto, AskResponseDto, SimilarityDto, SimilarityResponseDto, } from './dto/ai-debug.dto';
-import { fa } from 'zod/v4/locales';
-import { start } from 'repl';
-import { output } from 'zod';
 
 const DEFAULT_SYSTEM =
     'Você é o assistente do Logistics SaaS. Responda em português do Brasil, de forma curta e direta.';
